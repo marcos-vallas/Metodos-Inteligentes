@@ -1,5 +1,6 @@
 [gd_scene format=4 uid="uid://djqs1nylnmti8"]
 
+[ext_resource type="PackedScene" uid="uid://w5wkr5xirpid" path="res://Escenario/Escenes/escenario_2d.tscn" id="1_6xqqw"]
 [ext_resource type="PackedScene" uid="uid://byfxamot0rw4w" path="res://Player/Scenes/Player.tscn" id="2_ubvuf"]
 [ext_resource type="Texture2D" uid="uid://ck1ejfg55mg0j" path="res://Resources/Deco/06.png" id="2_xgtu7"]
 [ext_resource type="Texture2D" uid="uid://yvglpv8t385u" path="res://Resources/Tilemap_Flat.png" id="3_urkr7"]
@@ -551,7 +552,10 @@ size = Vector2(115, 116.25)
 
 [node name="Screen1" type="Node2D" unique_id=312666599]
 
+[node name="Escenario2D" parent="." unique_id=592091555 instance=ExtResource("1_6xqqw")]
+
 [node name="Ground" type="StaticBody2D" parent="." unique_id=1857405485]
+visible = false
 position = Vector2(-264, 125)
 physics_material_override = SubResource("PhysicsMaterial_bsbiv")
 
@@ -568,5 +572,5 @@ position = Vector2(-41.5, -232.125)
 shape = SubResource("RectangleShape2D_bsbiv")
 
 [node name="Player" parent="." unique_id=763683405 instance=ExtResource("2_ubvuf")]
-position = Vector2(2, 45)
+position = Vector2(170, 188)
 collision_mask = 3
