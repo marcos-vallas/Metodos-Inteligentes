@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://cbexi80bn57y1"]
+
+[ext_resource type="Script" uid="uid://blc6djd6uh4b3" path="res://Enemigos/wanderer.gd" id="1_xx40n"]
+[ext_resource type="Texture2D" uid="uid://b1oybxc5inh4r" path="res://Resources/Factions/Knights/Troops/Warrior/Yellow/Warrior_Yellow.png" id="2_uduj0"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_u0ya7"]
+radius = 23.0
+height = 84.0
+
+[node name="EnemigoBase" type="CharacterBody2D" unique_id=1368078515]
+scale = Vector2(0.3, 0.3)
+
+[node name="Movimiento" type="Node" parent="." unique_id=1113136282 node_paths=PackedStringArray("propietario", "rayitos")]
+script = ExtResource("1_xx40n")
+propietario = NodePath("..")
+rayitos = NodePath("../RayCast2D")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1859459552]
+texture = ExtResource("2_uduj0")
+hframes = 6
+vframes = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1514892951]
+shape = SubResource("CapsuleShape2D_u0ya7")
+
+[node name="RayCast2D" type="RayCast2D" parent="." unique_id=378808756]
+target_position = Vector2(203, 0)

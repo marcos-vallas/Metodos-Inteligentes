@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://byfxamot0rw4w" path="res://Player/Scenes/Player.tscn" id="2_ubvuf"]
 [ext_resource type="Texture2D" uid="uid://ck1ejfg55mg0j" path="res://Resources/Deco/06.png" id="2_xgtu7"]
 [ext_resource type="Texture2D" uid="uid://yvglpv8t385u" path="res://Resources/Tilemap_Flat.png" id="3_urkr7"]
+[ext_resource type="PackedScene" uid="uid://cbexi80bn57y1" path="res://Enemigos/enemigo_base.tscn" id="5_8jxof"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_bsbiv"]
 
@@ -574,3 +575,6 @@ shape = SubResource("RectangleShape2D_bsbiv")
 [node name="Player" parent="." unique_id=763683405 instance=ExtResource("2_ubvuf")]
 position = Vector2(170, 188)
 collision_mask = 3
+
+[node name="EnemigoBase" parent="." unique_id=1368078515 instance=ExtResource("5_8jxof")]
+position = Vector2(748, 160)
