@@ -1,4 +1,5 @@
-
+extends Resource
+class_name MovementComponent
 # movement_component.gd
 @export var speed : int = 400
 

@@ -240,7 +240,6 @@ frame = 1
 shape = SubResource("CircleShape2D_bsbiv")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=288863861]
-zoom = Vector2(1.63, 1.63)
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=422067489]
 libraries/ = SubResource("AnimationLibrary_03qnj")
