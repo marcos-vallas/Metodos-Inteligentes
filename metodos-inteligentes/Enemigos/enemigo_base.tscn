@@ -2,17 +2,59 @@
 
 [ext_resource type="Script" uid="uid://blc6djd6uh4b3" path="res://Enemigos/wanderer.gd" id="1_xx40n"]
 [ext_resource type="Texture2D" uid="uid://b1oybxc5inh4r" path="res://Resources/Factions/Knights/Troops/Warrior/Yellow/Warrior_Yellow.png" id="2_uduj0"]
+[ext_resource type="Script" uid="uid://c5lu0fe4lojgp" path="res://Enemigos/animacion_por_rotacion.gd" id="3_uduj0"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_u0ya7"]
 radius = 23.0
 height = 84.0
 
+[sub_resource type="Animation" id="Animation_30o13"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_3hy72"]
+resource_name = "corre_derecha"
+length = 0.5
+loop_mode = 1
+step = 0.25
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.25),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [6, 7]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_wtt14"]
+_data = {
+&"RESET": SubResource("Animation_30o13"),
+&"corre_derecha": SubResource("Animation_3hy72")
+}
+
 [node name="EnemigoBase" type="CharacterBody2D" unique_id=1368078515]
+rotation = 6.2831855
 scale = Vector2(0.3, 0.3)
 
 [node name="Movimiento" type="Node" parent="." unique_id=1113136282 node_paths=PackedStringArray("propietario", "rayitos")]
 script = ExtResource("1_xx40n")
 propietario = NodePath("..")
+velocidad = 200
 rayitos = NodePath("../RayCast2D")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1859459552]
@@ -24,4 +66,12 @@ vframes = 8
 shape = SubResource("CapsuleShape2D_u0ya7")
 
 [node name="RayCast2D" type="RayCast2D" parent="." unique_id=378808756]
-target_position = Vector2(203, 0)
+position = Vector2(0, 23.333332)
+target_position = Vector2(176.66666, 0)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1510199661 node_paths=PackedStringArray("propietario", "movimiento")]
+libraries/ = SubResource("AnimationLibrary_wtt14")
+autoplay = &"corre_derecha"
+script = ExtResource("3_uduj0")
+propietario = NodePath("..")
+movimiento = NodePath("../Movimiento")
