@@ -1,0 +1,70 @@
+[gd_scene format=3 uid="uid://cx82k30mva75d"]
+
+[ext_resource type="Script" uid="uid://btbiwk4fa2py3" path="res://Enemigos/Navigation/agente_2.gd" id="1_a2gd"]
+[ext_resource type="Texture2D" uid="uid://cr00kdxrn4b42" path="res://Resources/Factions/Knights/Troops/Warrior/Red/Warrior_Red.png" id="2_a2tex"]
+[ext_resource type="Script" uid="uid://bghadbdk1uui0" path="res://Player/Scripts/movement_component.gd" id="3_a2mov"]
+
+[sub_resource type="Resource" id="Resource_mov"]
+script = ExtResource("3_a2mov")
+speed = 100
+metadata/_custom_type_script = "uid://bghadbdk1uui0"
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_body"]
+radius = 9.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_cast"]
+radius = 7.55
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_grande"]
+radius = 372.04837
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_chica"]
+radius = 37.12142
+
+[node name="Agente2" type="CharacterBody2D" unique_id=987654321 node_paths=PackedStringArray("area_grande", "area_chica", "caster", "sprite")]
+collision_layer = 16
+collision_mask = 7
+script = ExtResource("1_a2gd")
+tipo_npc = 0
+componente_movimento = SubResource("Resource_mov")
+area_grande = NodePath("AreaGrande")
+area_chica = NodePath("AreaChica")
+caster = NodePath("ShapeCast2D")
+sprite = NodePath("Sprite2D")
+radio_wander = 100.0
+tiempo_idle_min = 0.0
+tiempo_idle_max = 0.0
+tiempo_max_wander = 2.0
+peso_evasion = 2.0
+tiempo_paso_barrido = 1.04
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=123456789]
+scale = Vector2(0.645, 0.645)
+texture = ExtResource("2_a2tex")
+hframes = 6
+vframes = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=234567890]
+shape = SubResource("CapsuleShape2D_body")
+
+[node name="ShapeCast2D" type="ShapeCast2D" parent="." unique_id=345678901]
+shape = SubResource("CircleShape2D_cast")
+target_position = Vector2(86, 0)
+collision_mask = 7
+
+[node name="AreaGrande" type="Area2D" parent="." unique_id=456789012]
+collision_layer = 0
+collision_mask = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaGrande" unique_id=567890123]
+shape = SubResource("CircleShape2D_grande")
+
+[node name="AreaChica" type="Area2D" parent="." unique_id=678901234]
+collision_layer = 0
+collision_mask = 7
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaChica" unique_id=789012345]
+shape = SubResource("CircleShape2D_chica")
+
+[connection signal="body_entered" from="AreaGrande" to="." method="_on_area_grande_body_entered"]
+[connection signal="body_exited" from="AreaGrande" to="." method="_on_area_grande_body_exited"]

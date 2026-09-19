@@ -1,0 +1,105 @@
+[gd_scene format=3 uid="uid://wxpcc7lpsdn6"]
+
+[ext_resource type="Script" uid="uid://dabauvsftabi2" path="res://Enemigos/Navigation/agente_3.gd" id="1_xb1s8"]
+[ext_resource type="Script" uid="uid://bghadbdk1uui0" path="res://Player/Scripts/movement_component.gd" id="2_u22gi"]
+[ext_resource type="Texture2D" uid="uid://cr00kdxrn4b42" path="res://Resources/Factions/Knights/Troops/Warrior/Red/Warrior_Red.png" id="3_0ex3w"]
+[ext_resource type="Script" uid="uid://cuvjqo3wnfjja" path="res://Enemigos/scripts/wander_comp.gd" id="3_u22gi"]
+
+[sub_resource type="Resource" id="Resource_8jxof"]
+script = ExtResource("2_u22gi")
+speed = 10
+metadata/_custom_type_script = "uid://bghadbdk1uui0"
+
+[sub_resource type="Resource" id="Resource_fwm4w"]
+script = ExtResource("3_u22gi")
+speed = 116
+metadata/_custom_type_script = "uid://cuvjqo3wnfjja"
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_body"]
+radius = 9.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_grande"]
+radius = 372.04837
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_chica"]
+radius = 53.037724
+
+[node name="Agente3" type="CharacterBody2D" unique_id=987654321 node_paths=PackedStringArray("area_grande", "area_chica", "casters")]
+collision_layer = 16
+collision_mask = 7
+script = ExtResource("1_xb1s8")
+componente_movimento = SubResource("Resource_8jxof")
+componente_wander = SubResource("Resource_fwm4w")
+area_grande = NodePath("AreaGrande")
+area_chica = NodePath("AreaChica")
+casters = NodePath("")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=123456789]
+scale = Vector2(0.505, 0.505)
+texture = ExtResource("3_0ex3w")
+hframes = 6
+vframes = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=234567890]
+shape = SubResource("CapsuleShape2D_body")
+
+[node name="AreaGrande" type="Area2D" parent="." unique_id=456789012]
+collision_layer = 0
+collision_mask = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaGrande" unique_id=567890123]
+shape = SubResource("CircleShape2D_grande")
+
+[node name="AreaChica" type="Area2D" parent="." unique_id=678901234]
+collision_layer = 0
+collision_mask = 7
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaChica" unique_id=789012345]
+shape = SubResource("CircleShape2D_chica")
+
+[node name="Casters" type="Node2D" parent="." unique_id=568049083]
+
+[node name="RC_0" type="RayCast2D" parent="Casters" unique_id=186551935]
+target_position = Vector2(157, 0)
+collision_mask = 7
+
+[node name="RayCast2D" type="RayCast2D" parent="Casters" unique_id=906100949]
+target_position = Vector2(128, -35)
+collision_mask = 7
+
+[node name="RayCast2D6" type="RayCast2D" parent="Casters" unique_id=1237436373]
+target_position = Vector2(121, 34)
+collision_mask = 7
+
+[node name="RayCast2D2" type="RayCast2D" parent="Casters" unique_id=1527722968]
+target_position = Vector2(91, -55)
+collision_mask = 7
+
+[node name="RayCast2D7" type="RayCast2D" parent="Casters" unique_id=1069773876]
+target_position = Vector2(71, 53)
+collision_mask = 7
+
+[node name="RayCast2D3" type="RayCast2D" parent="Casters" unique_id=1227033834]
+target_position = Vector2(44, -62)
+collision_mask = 7
+
+[node name="RayCast2D8" type="RayCast2D" parent="Casters" unique_id=209592470]
+target_position = Vector2(26, 64)
+collision_mask = 7
+
+[node name="RayCast2D4" type="RayCast2D" parent="Casters" unique_id=779167037]
+target_position = Vector2(0, -66)
+collision_mask = 7
+
+[node name="RayCast2D9" type="RayCast2D" parent="Casters" unique_id=11002138]
+target_position = Vector2(0, 69)
+collision_mask = 7
+
+[node name="RC_180" type="RayCast2D" parent="Casters" unique_id=400760096]
+target_position = Vector2(-102, 0)
+collision_mask = 7
+
+[connection signal="body_entered" from="AreaGrande" to="." method="_on_area_grande_body_entered"]
+[connection signal="body_exited" from="AreaGrande" to="." method="_on_area_grande_body_exited"]
+[connection signal="body_entered" from="AreaChica" to="." method="_on_area_chica_body_entered"]
+[connection signal="body_exited" from="AreaChica" to="." method="_on_area_chica_body_exited"]

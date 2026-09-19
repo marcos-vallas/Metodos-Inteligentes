@@ -22,7 +22,7 @@ func get_motion() -> Vector2:
 	move_direction.y = int(Input.is_action_pressed("down")) - int(Input.is_action_pressed("up"))
 	return move_direction.normalized() * speed
 	
-	# 1. SEEK (Perseguir)
+# 1. SEEK (Perseguir)
 func seek(current_pos: Vector2, target_pos: Vector2) -> Vector2:
 	move_direction = (target_pos - current_pos).normalized()
 	return move_direction * speed
@@ -56,5 +56,4 @@ func wander() -> Vector2:
 	var displacement = Vector2(cos(wander_angle), sin(wander_angle)) * wander_radius
 	move_direction = (circle_center + displacement).normalized()
 	return move_direction * speed
-	
 	
