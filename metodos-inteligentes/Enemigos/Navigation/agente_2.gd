@@ -515,3 +515,7 @@ func _draw() -> void:
 	if velocity != Vector2.ZERO:
 		var vel_dir_local = velocity.rotated(-global_rotation).normalized() * (35.0 / escala)
 		draw_line(Vector2.ZERO, vel_dir_local, Color(0.2, 1.0, 0.2, 0.9), 2.5 / escala)
+
+
+func _on_area_chica_body_entered(body: Node2D) -> void:
+	pass # Replace with function body.
