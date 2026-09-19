@@ -1,0 +1,29 @@
+[gd_scene format=3 uid="uid://dw2paw7ntrwdl"]
+
+[ext_resource type="Script" uid="uid://2c2e652li1yc" path="res://Enemigos/Navigation/agente_1.gd" id="1_1jfwh"]
+[ext_resource type="Texture2D" uid="uid://cr00kdxrn4b42" path="res://Resources/Factions/Knights/Troops/Warrior/Red/Warrior_Red.png" id="1_b0tub"]
+[ext_resource type="Script" uid="uid://bghadbdk1uui0" path="res://Player/Scripts/movement_component.gd" id="2_bhbn2"]
+
+[sub_resource type="Resource" id="Resource_8jxof"]
+script = ExtResource("2_bhbn2")
+speed = 100
+wander_distance = 79.58
+metadata/_custom_type_script = "uid://bghadbdk1uui0"
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_bsbiv"]
+radius = 23.0
+height = 70.0
+
+[node name="Agente1" type="CharacterBody2D" unique_id=594747415]
+script = ExtResource("1_1jfwh")
+componente_movimento = SubResource("Resource_8jxof")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1455571795]
+texture = ExtResource("1_b0tub")
+hframes = 6
+vframes = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1224381657]
+shape = SubResource("CapsuleShape2D_bsbiv")
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="." unique_id=1494178944]
