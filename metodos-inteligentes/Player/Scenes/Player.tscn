@@ -18,7 +18,9 @@ metadata/_custom_type_script = "uid://bvlh8detick8e"
 script = ExtResource("4_o00bb")
 metadata/_custom_type_script = "uid://03le87n0pah5"
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_bsbiv"]
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_7jgbj"]
+radius = 23.333332
+height = 80.0
 
 [sub_resource type="Animation" id="Animation_ffv5t"]
 length = 0.001
@@ -221,8 +223,12 @@ states/run/node = SubResource("AnimationNodeAnimation_qknkb")
 states/run/position = Vector2(658, 115)
 transitions = ["Start", "idle", SubResource("AnimationNodeStateMachineTransition_o00bb"), "idle", "run", SubResource("AnimationNodeStateMachineTransition_l6m33"), "run", "idle", SubResource("AnimationNodeStateMachineTransition_gs3kl"), "idle", "anim1", SubResource("AnimationNodeStateMachineTransition_03qnj"), "anim1", "idle", SubResource("AnimationNodeStateMachineTransition_qw2rl")]
 
-[node name="Player" type="CharacterBody2D" unique_id=763683405 node_paths=PackedStringArray("animation_tree")]
+[node name="Player" type="CharacterBody2D" unique_id=763683405 node_paths=PackedStringArray("animation_tree") groups=["Player"]]
 scale = Vector2(0.3, 0.3)
+collision_layer = 8
+collision_mask = 247
+platform_floor_layers = 4294967041
+platform_wall_layers = 2
 script = ExtResource("1_yrefi")
 movement_comp = SubResource("Resource_ffv5t")
 state_comp = SubResource("Resource_o00bb")
@@ -237,7 +243,8 @@ vframes = 8
 frame = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1848096300]
-shape = SubResource("CircleShape2D_bsbiv")
+position = Vector2(0, -30)
+shape = SubResource("CapsuleShape2D_7jgbj")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=288863861]
 zoom = Vector2(1.63, 1.63)
