@@ -7,13 +7,8 @@ extends CharacterBody2D
 @export var animation_tree : AnimationTree #= $AnimationTree
 @export var animation_comp : AnimationComponent
 
-
-
-
-
 func _ready() -> void:
 	animation_comp.setup(animation_tree) 
-	
 	
 	
 func _physics_process(delta: float) -> void:

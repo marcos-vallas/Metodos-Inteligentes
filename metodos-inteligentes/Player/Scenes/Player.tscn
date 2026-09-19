@@ -226,8 +226,8 @@ scale = Vector2(0.3, 0.3)
 script = ExtResource("1_yrefi")
 movement_comp = SubResource("Resource_ffv5t")
 state_comp = SubResource("Resource_o00bb")
-animation_comp = SubResource("Resource_ubvuf")
 animation_tree = NodePath("AnimationTree")
+animation_comp = SubResource("Resource_ubvuf")
 
 [node name="WarriorBlue" type="Sprite2D" parent="." unique_id=1306866681]
 position = Vector2(0, -30)
