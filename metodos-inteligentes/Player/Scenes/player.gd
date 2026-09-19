@@ -1,4 +1,5 @@
 extends CharacterBody2D
+class_name Jugador
 
 @export_category("Components")
 @export var movement_comp : MovementComponent
