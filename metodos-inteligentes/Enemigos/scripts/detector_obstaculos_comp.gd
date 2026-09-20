@@ -16,11 +16,11 @@ signal obstaculo_despejado
 
 @export_group("Rango y Geometría")
 ## Distancia máxima en píxeles para considerar que un rayo frontal detecta un obstáculo anticipado.
-@export var distancia_anticipacion: float = 80.0
+@export var distancia_anticipacion: float = 60.0
 ## Ancho del cuerpo para el trazado de rayos paralelos (whiskers de paso libre).
 @export var ancho_paso: float = 11.0
 ## Distancia por defecto para verificar si una trayectoria está despejada.
-@export var distancia_verificacion_paso: float = 60.0
+@export var distancia_verificacion_paso: float = 30.0
 
 @export_group("Grupos de Detección")
 ## Nombres de grupo considerados obstáculos generales (rocas, árboles, etc.).
@@ -35,6 +35,10 @@ signal obstaculo_despejado
 @export_group("Cono Frontal y Ángulos")
 ## Índices de los raycasts de 'casters' que componen el cono frontal de advertencia (ej. [0, 1, 2, 3, 4]).
 @export var indices_cono_frontal: Array[int] = [0, 1, 2]
+
+@export_group("Evasión de Paredes")
+## Ángulo de variación aleatoria (en grados) aplicado al vector contrario a la pared para evitar rebotes simétricos y desatascar al NPC acorralado.
+@export_range(0.0, 90.0, 1.0) var variacion_angulo_pared: float = 40.0
 
 # 3. VARIABLES DE ESTADO / DEBUG
 var ultimo_rc_objetivo: Vector2 = Vector2.ZERO
@@ -111,8 +115,9 @@ func hay_obstaculo_anticipado(actor_pos: Vector2, casters: Node2D, distancia_ove
 					return true
 	return false
 
-## Calcula un vector contrario a la dirección promedio de los raycasts que tocan pared.
-func obtener_vector_contrario_a_pared(casters: Node2D) -> Vector2:
+## Calcula un vector contrario a la dirección promedio de los raycasts que tocan pared,
+## aplicando una variación angular aleatoria para que no sea exactamente el inverso y evitar quedar bloqueado.
+func obtener_vector_contrario_a_pared(casters: Node2D, aplicar_variacion: bool = true) -> Vector2:
 	if not casters:
 		return Vector2.ZERO
 	
@@ -125,7 +130,12 @@ func obtener_vector_contrario_a_pared(casters: Node2D) -> Vector2:
 				suma_dirs += dir_rayo
 	
 	if suma_dirs != Vector2.ZERO:
-		return -suma_dirs.normalized()
+		var dir_inversa: Vector2 = -suma_dirs.normalized()
+		if aplicar_variacion and variacion_angulo_pared > 0.0:
+			var signo: float = -1.0 if randf() < 0.5 else 1.0
+			var angulo_azar: float = randf_range(deg_to_rad(15.0), deg_to_rad(variacion_angulo_pared)) * signo
+			dir_inversa = dir_inversa.rotated(angulo_azar).normalized()
+		return dir_inversa
 	return Vector2.ZERO
 
 ## Comprueba si una dirección global está libre usando 3 rayos paralelos al ancho de paso del actor.
