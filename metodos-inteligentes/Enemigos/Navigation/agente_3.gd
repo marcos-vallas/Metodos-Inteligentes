@@ -30,42 +30,19 @@ enum Estado {
 @export var componente_flee: FleeComponent
 @export var componente_detector: ObstacleDetectorComponent
 
-@export_category("Evasión de Obstáculos")
-## Tiempo mínimo que permanece en estado de esquiva para evitar cancelaciones prematuras u oscilaciones
-@export var tiempo_min_esquivando: float = 0.35
-## Tiempo máximo continuo en estado de esquiva antes de forzar un desvío angular para despegarse de paredes
-@export var tiempo_max_esquivando: float = 1.2
-## Distancia máxima en píxeles a la que un raycast frontal activa anticipadamente la evasión
-@export var distancia_anticipacion_obstaculo: float = 80.0
-
 @export_category("Sensores")
 @export var area_grande: Area2D    ## Sensor de Percepción (detecta al Jugador)
 @export var area_chica: Area2D     ## Sensor de Proximidad (detecta obstáculos cercanos)
 @export var casters: Node2D        ## Contenedor de RayCast2D direccionales
 @onready var sprite: Sprite2D = $Sprite2D
 
-@export_category("Wander & Idle")
-@export var umbral_llegada_punto: float = 20.0     ## Distancia para considerar que llegó al objetivo
-
-@export_category("Seek & Arrive")
-@export var arrive_stop_radius: float = 35.0       ## Distancia de parada frente al jugador
-
-@export_category("Evasión por Suma de Vectores")
-@export var peso_evasion: float = 1.6              ## Ponderación de la fuerza evasiva sobre la fuerza deseada
-@export_flags_2d_physics var mascara_obstaculos: int = 7 ## Capas de paredes y obstáculos (1, 2 y 3)
-
 @export_category("Visual Debug")
 @export var debug_draw: bool = true
 
-# Variables de estado y control
+# Variables de estado y control del actor
 var estado_actual: Estado = Estado.WANDER
 var objetivo_player: Node2D = null
-var objetivo_wander: Vector2 = Vector2.ZERO
-var direccion_actual: Vector2 = Vector2.RIGHT
-
-var direccionlibre: Vector2 = Vector2.ZERO
 var obstaculos_en_rango: Array[Node2D] = []
-var timer_esquivando: float = 0.0
 
 ## Permite cambiar el rol del NPC en caliente desde el Inspector
 func set_tipo_npc(nuevo_tipo: TipoNPC) -> void:
@@ -86,13 +63,9 @@ func set_tipo_npc(nuevo_tipo: TipoNPC) -> void:
 					return
 
 func _ready() -> void:
-	# Asegurar que el detector de obstáculos exista por defecto
+	# Asegurar que el detector de obstáculos exista por defecto si no se asignó en Inspector
 	if not componente_detector:
 		componente_detector = ObstacleDetectorComponent.new()
-	if mascara_obstaculos != 0 and componente_detector:
-		componente_detector.mascara_obstaculos = mascara_obstaculos
-	if distancia_anticipacion_obstaculo > 0.0 and componente_detector:
-		componente_detector.distancia_anticipacion = distancia_anticipacion_obstaculo
 	
 	# Conexión de sensores de percepción y proximidad
 	if area_grande:
@@ -110,14 +83,15 @@ func _ready() -> void:
 	set_tipo_npc(tipo_npc)
 
 func _physics_process(delta: float) -> void:
-	# 1. Alinear el contenedor de sensores con la velocidad
+	# 1. Alinear el contenedor de sensores con la dirección de movimiento
 	if casters and velocity.length_squared() > 1.0:
 		casters.rotation = velocity.angle()
 	
-	# 2. Forzar actualización de raycasts sensoriales
-	actualizar_raycasts()
+	# 2. Actualizar raycasts sensoriales
+	if componente_detector:
+		componente_detector.actualizar_raycasts(casters)
 	
-	# 3. Procesar comportamiento y decisiones de evasión
+	# 3. Procesar comportamiento y decisiones de movimiento
 	procesar_comportamiento(delta)
 	
 	# 4. Movimiento físico
@@ -133,115 +107,30 @@ func actualizar_orientacion_sprite() -> void:
 		elif velocity.x > 1.0:
 			sprite.flip_h = false
 
-#region Delegación sensorial al ObstacleDetectorComponent
-func es_obstaculo(collider: Object) -> bool:
-	return componente_detector.es_obstaculo(collider) if componente_detector else false
-
-func es_pared(collider: Object) -> bool:
-	return componente_detector.es_pared(collider) if componente_detector else false
-
-func rc_toca_obstaculo(rc: RayCast2D) -> bool:
-	return componente_detector.rc_toca_obstaculo(rc) if componente_detector else false
-
-func rc_toca_pared(rc: RayCast2D) -> bool:
-	return componente_detector.rc_toca_pared(rc) if componente_detector else false
-
-func hay_pared_en_area_chica() -> bool:
-	return componente_detector.hay_pared_en_area(area_chica, obstaculos_en_rango) if componente_detector else false
-
-func obtener_vector_contrario_a_pared() -> Vector2:
-	return componente_detector.obtener_vector_contrario_a_pared(casters) if componente_detector else Vector2.ZERO
-
-func hay_obstaculo_anticipado() -> bool:
-	if not componente_detector:
-		return false
-	return componente_detector.hay_obstaculo_anticipado(global_position, casters, distancia_anticipacion_obstaculo)
-
-func actualizar_raycasts() -> void:
-	if componente_detector:
-		componente_detector.actualizar_raycasts(casters)
-
-func esta_direccion_obstruida(dir_global: Vector2, distancia: float = 60.0) -> bool:
-	if not componente_detector:
-		return false
-	var espacio = get_world_2d().direct_space_state
-	return componente_detector.esta_direccion_obstruida(espacio, global_position, dir_global, distancia, get_rid())
-#endregion
-
-#region Control de Evasión
+#region Transiciones de Estado de Evasión (FSM)
 func iniciar_esquiva() -> void:
 	estado_actual = Estado.ESQUIVANDO
-	timer_esquivando = 0.0
-	actualizar_raycasts()
-	actualizar_direccion_evasion()
-
-func puede_salir_de_esquiva() -> bool:
-	if timer_esquivando < tiempo_min_esquivando:
-		return false
-	if not obstaculos_en_rango.is_empty():
-		return false
-	if hay_obstaculo_anticipado():
-		return false
-	if tipo_npc == TipoNPC.FLEEKER and objetivo_player != null and is_instance_valid(objetivo_player):
-		var dir_flee: Vector2 = (global_position - objetivo_player.global_position).normalized()
-		if esta_direccion_obstruida(dir_flee, distancia_anticipacion_obstaculo * 0.75):
-			return false
-	return true
+	if componente_detector:
+		componente_detector.actualizar_raycasts(casters)
+	if componente_esquiva:
+		componente_esquiva.iniciar_maniobra()
 
 func retornar_a_estado_normal() -> void:
-	timer_esquivando = 0.0
+	var dir_salida: Vector2 = componente_esquiva.direccion_actual if componente_esquiva else velocity.normalized()
 	if tipo_npc == TipoNPC.WANDERER or objetivo_player == null or not is_instance_valid(objetivo_player):
 		estado_actual = Estado.WANDER
 		if componente_wander:
-			componente_wander.establecer_objetivo(direccionlibre)
+			componente_wander.establecer_objetivo(dir_salida)
 	else:
 		if tipo_npc == TipoNPC.SEEKER:
 			estado_actual = Estado.SEEK
 		elif tipo_npc == TipoNPC.FLEEKER:
 			estado_actual = Estado.FLEE
 
-func actualizar_direccion_evasion() -> void:
-	if not componente_detector:
-		return
-		
-	var dir_amenaza: Vector2 = Vector2.ZERO
+func obtener_direccion_amenaza() -> Vector2:
 	if tipo_npc == TipoNPC.FLEEKER and objetivo_player and is_instance_valid(objetivo_player):
-		dir_amenaza = (objetivo_player.global_position - global_position).normalized()
-		
-	var fallback_wander: Vector2 = componente_wander.direccion_objetivo if componente_wander else Vector2.ZERO
-	var es_pared: bool = hay_pared_en_area_chica()
-	
-	direccionlibre = componente_detector.calcular_direccion_evasion(
-		self, casters, area_chica, obstaculos_en_rango, dir_amenaza, fallback_wander
-	)
-	
-	if componente_esquiva:
-		componente_esquiva.establecer_direccion(direccionlibre)
-	if es_pared and componente_wander:
-		componente_wander.establecer_objetivo(direccionlibre, true)
-
-func forzar_despegue_pared() -> void:
-	if not componente_detector:
-		return
-		
-	var dir_amenaza: Vector2 = Vector2.ZERO
-	if tipo_npc == TipoNPC.FLEEKER and objetivo_player and is_instance_valid(objetivo_player):
-		dir_amenaza = (objetivo_player.global_position - global_position).normalized()
-		
-	direccionlibre = componente_detector.forzar_despegue_pared(
-		self, casters, area_chica, obstaculos_en_rango, dir_amenaza
-	)
-	
-	if componente_esquiva:
-		componente_esquiva.establecer_direccion(direccionlibre)
-		velocity = direccionlibre * componente_esquiva.speed
-	else:
-		velocity = direccionlibre * 70.0
-		
-	if casters:
-		casters.rotation = direccionlibre.angle()
-	if componente_wander:
-		componente_wander.establecer_objetivo(direccionlibre, true)
+		return (objetivo_player.global_position - global_position).normalized()
+	return Vector2.ZERO
 #endregion
 
 #region Máquina de Estados y Comportamiento
@@ -253,29 +142,37 @@ func procesar_comportamiento(delta: float = 0.0) -> void:
 			if componente_seek:
 				ya_llego_al_player = componente_seek.ha_llegado(global_position, objetivo_player.global_position)
 			else:
-				ya_llego_al_player = global_position.distance_to(objetivo_player.global_position) <= arrive_stop_radius
+				ya_llego_al_player = global_position.distance_to(objetivo_player.global_position) <= 35.0
 		
-		if not ya_llego_al_player and hay_obstaculo_anticipado():
+		if not ya_llego_al_player and componente_detector and componente_detector.hay_obstaculo_anticipado(global_position, casters):
 			iniciar_esquiva()
 
 	match estado_actual:
 		Estado.WANDER:
 			if componente_wander:
 				velocity = componente_wander.wander(delta)
+
 		Estado.ESQUIVANDO:
-			timer_esquivando += delta
-			if timer_esquivando >= tiempo_max_esquivando:
-				forzar_despegue_pared()
-				timer_esquivando = 0.0
-			else:
-				actualizar_direccion_evasion()
-				if puede_salir_de_esquiva():
-					retornar_a_estado_normal()
+			if not componente_esquiva:
+				return
+				
+			var dir_amenaza: Vector2 = obtener_direccion_amenaza()
+			var fallback_wander: Vector2 = componente_wander.direccion_objetivo if componente_wander else Vector2.ZERO
 			
-			if componente_esquiva:
-				velocity = componente_esquiva.esquivar(direccionlibre, delta)
-			else:
-				velocity = direccionlibre * 70.0
+			# Delegación completa de la maniobra al EsquivaComponent
+			velocity = componente_esquiva.procesar_maniobra(
+				self, delta, componente_detector, casters, area_chica, obstaculos_en_rango, dir_amenaza, fallback_wander
+			)
+			
+			# Sincronización de rumbo en Wander si se bordea o despega de una pared
+			if componente_detector and componente_detector.hay_pared_en_area(area_chica, obstaculos_en_rango):
+				if componente_wander:
+					componente_wander.establecer_objetivo(componente_esquiva.direccion_actual, true)
+			
+			# Evaluación de salida segura de la esquiva
+			var espacio = get_world_2d().direct_space_state
+			if componente_esquiva.puede_salir(componente_detector, global_position, casters, obstaculos_en_rango, dir_amenaza, espacio, get_rid()):
+				retornar_a_estado_normal()
 
 		Estado.SEEK:
 			if objetivo_player == null or not is_instance_valid(objetivo_player):
@@ -285,7 +182,8 @@ func procesar_comportamiento(delta: float = 0.0) -> void:
 				velocity = componente_seek.calcular_velocidad(global_position, objetivo_player.global_position, delta)
 			else:
 				var a_player: Vector2 = objetivo_player.global_position - global_position
-				if a_player.length() <= arrive_stop_radius:
+				var stop_dist: float = componente_seek.arrive_stop_radius if componente_seek else 35.0
+				if a_player.length() <= stop_dist:
 					velocity = Vector2.ZERO
 				else:
 					var dir_seek: Vector2 = a_player.normalized()
@@ -328,22 +226,26 @@ func _on_area_grande_body_exited(body: Node2D) -> void:
 		if estado_actual != Estado.ESQUIVANDO:
 			estado_actual = Estado.WANDER
 			if componente_wander:
-				var dir_salida: Vector2 = velocity.normalized() if velocity != Vector2.ZERO else direccion_actual
+				var dir_salida: Vector2 = velocity.normalized() if velocity != Vector2.ZERO else Vector2.RIGHT
 				componente_wander.establecer_objetivo(dir_salida)
 
 func _on_area_chica_body_entered(body: Node2D) -> void:
-	if es_obstaculo(body):
+	if componente_detector and componente_detector.es_obstaculo(body):
 		if not obstaculos_en_rango.has(body):
 			obstaculos_en_rango.append(body)
 		iniciar_esquiva()
 
 func _on_area_chica_body_exited(body: Node2D) -> void:
-	if es_obstaculo(body):
+	if componente_detector and componente_detector.es_obstaculo(body):
 		obstaculos_en_rango.erase(body)
 		obstaculos_en_rango = obstaculos_en_rango.filter(func(b): return is_instance_valid(b))
-		actualizar_raycasts()
-		if puede_salir_de_esquiva():
-			retornar_a_estado_normal()
+		if componente_detector:
+			componente_detector.actualizar_raycasts(casters)
+		if estado_actual == Estado.ESQUIVANDO and componente_esquiva:
+			var dir_amenaza: Vector2 = obtener_direccion_amenaza()
+			var espacio = get_world_2d().direct_space_state
+			if componente_esquiva.puede_salir(componente_detector, global_position, casters, obstaculos_en_rango, dir_amenaza, espacio, get_rid()):
+				retornar_a_estado_normal()
 #endregion
 
 #region Visual Debug

@@ -5,31 +5,66 @@
 [ext_resource type="PackedScene" uid="uid://wxpcc7lpsdn6" path="res://Enemigos/Navigation/Agente_3.tscn" id="4_6xqqw"]
 [ext_resource type="Script" uid="uid://cuvjqo3wnfjja" path="res://Enemigos/scripts/wander_comp.gd" id="4_8jxof"]
 [ext_resource type="Script" uid="uid://bxrgdr67y0b6c" path="res://Enemigos/scripts/esquiva_comp.gd" id="5_8jxof"]
+[ext_resource type="Script" uid="uid://dn0iio8bis808" path="res://Enemigos/scripts/seek_comp.gd" id="6_otorl"]
+[ext_resource type="Script" uid="uid://c31h4fw5mvib6" path="res://Enemigos/scripts/flee_comp.gd" id="7_lrlib"]
+[ext_resource type="Script" uid="uid://dwb4022gfdnlf" path="res://Enemigos/scripts/detector_obstaculos_comp.gd" id="8_hcxiy"]
 
-[sub_resource type="Resource" id="Resource_yl6o2"]
+[sub_resource type="Resource" id="Resource_d7aw2"]
 script = ExtResource("4_8jxof")
 metadata/_custom_type_script = "uid://cuvjqo3wnfjja"
 
-[sub_resource type="Resource" id="Resource_11m7y"]
+[sub_resource type="Resource" id="Resource_hg8fs"]
 script = ExtResource("5_8jxof")
+metadata/_custom_type_script = "uid://bxrgdr67y0b6c"
 
-[sub_resource type="Resource" id="Resource_6xqqw"]
-resource_local_to_scene = true
+[sub_resource type="Resource" id="Resource_wthak"]
+script = ExtResource("6_otorl")
+
+[sub_resource type="Resource" id="Resource_lnwmv"]
+script = ExtResource("7_lrlib")
+
+[sub_resource type="Resource" id="Resource_bjww6"]
+script = ExtResource("8_hcxiy")
+metadata/_custom_type_script = "uid://dwb4022gfdnlf"
+
+[sub_resource type="Resource" id="Resource_30k8b"]
 script = ExtResource("4_8jxof")
-tiempo_movimiento = 8.9
-angulo_min_variacion = 8.5
-angulo_max_variacion = 53.5
 metadata/_custom_type_script = "uid://cuvjqo3wnfjja"
 
-[sub_resource type="Resource" id="Resource_hcxiy"]
+[sub_resource type="Resource" id="Resource_s4i54"]
 script = ExtResource("5_8jxof")
+metadata/_custom_type_script = "uid://bxrgdr67y0b6c"
 
-[sub_resource type="Resource" id="Resource_otorl"]
+[sub_resource type="Resource" id="Resource_eis53"]
+script = ExtResource("6_otorl")
+
+[sub_resource type="Resource" id="Resource_ma0n4"]
+script = ExtResource("7_lrlib")
+
+[sub_resource type="Resource" id="Resource_j7u55"]
+script = ExtResource("8_hcxiy")
+metadata/_custom_type_script = "uid://dwb4022gfdnlf"
+
+[sub_resource type="Resource" id="Resource_6scup"]
 script = ExtResource("4_8jxof")
 metadata/_custom_type_script = "uid://cuvjqo3wnfjja"
 
-[sub_resource type="Resource" id="Resource_lrlib"]
+[sub_resource type="Resource" id="Resource_uucbs"]
 script = ExtResource("5_8jxof")
+metadata/_custom_type_script = "uid://bxrgdr67y0b6c"
+
+[sub_resource type="Resource" id="Resource_3nf4l"]
+script = ExtResource("6_otorl")
+
+[sub_resource type="Resource" id="Resource_jc22d"]
+script = ExtResource("7_lrlib")
+
+[sub_resource type="Resource" id="Resource_hacjn"]
+script = ExtResource("8_hcxiy")
+distancia_anticipacion = 10.0
+distancia_verificacion_paso = 5.0
+variacion_angulo_pared = 20.0
+metadata/_custom_type_script = "uid://dwb4022gfdnlf"
 
 [node name="Screen1" type="Node2D" unique_id=312666599]
 
@@ -42,8 +77,11 @@ collision_mask = 7
 [node name="Agente3" parent="." unique_id=1056296151 instance=ExtResource("4_6xqqw")]
 position = Vector2(447, 555)
 tipo_npc = 0
-componente_wander = SubResource("Resource_yl6o2")
-componente_esquiva = SubResource("Resource_11m7y")
+componente_wander = SubResource("Resource_d7aw2")
+componente_esquiva = SubResource("Resource_hg8fs")
+componente_seek = SubResource("Resource_wthak")
+componente_flee = SubResource("Resource_lnwmv")
+componente_detector = SubResource("Resource_bjww6")
 
 [node name="Label" type="Label" parent="Agente3" unique_id=641638238]
 offset_right = 40.0
@@ -52,8 +90,11 @@ text = "Wander"
 
 [node name="Agente4" parent="." unique_id=987654321 instance=ExtResource("4_6xqqw")]
 position = Vector2(407, 412)
-componente_wander = SubResource("Resource_6xqqw")
-componente_esquiva = SubResource("Resource_hcxiy")
+componente_wander = SubResource("Resource_30k8b")
+componente_esquiva = SubResource("Resource_s4i54")
+componente_seek = SubResource("Resource_eis53")
+componente_flee = SubResource("Resource_ma0n4")
+componente_detector = SubResource("Resource_j7u55")
 
 [node name="Label" type="Label" parent="Agente4" unique_id=574227626]
 offset_right = 40.0
@@ -63,8 +104,11 @@ text = "Seeker"
 [node name="Agente5" parent="." unique_id=1832309522 instance=ExtResource("4_6xqqw")]
 position = Vector2(896, 421)
 tipo_npc = 2
-componente_wander = SubResource("Resource_otorl")
-componente_esquiva = SubResource("Resource_lrlib")
+componente_wander = SubResource("Resource_6scup")
+componente_esquiva = SubResource("Resource_uucbs")
+componente_seek = SubResource("Resource_3nf4l")
+componente_flee = SubResource("Resource_jc22d")
+componente_detector = SubResource("Resource_hacjn")
 
 [node name="Label" type="Label" parent="Agente5" unique_id=2109901753]
 offset_right = 40.0
