@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://bxrgdr67y0b6c" path="res://Enemigos/scripts/esquiva_comp.gd" id="4_esq1v"]
 [ext_resource type="Script" uid="uid://dn0iio8bis808" path="res://Enemigos/scripts/seek_comp.gd" id="5_seek"]
 [ext_resource type="Script" uid="uid://c31h4fw5mvib6" path="res://Enemigos/scripts/flee_comp.gd" id="6_flee"]
+[ext_resource type="Script" uid="uid://dwb4022gfdnlf" path="res://Enemigos/scripts/detector_obstaculos_comp.gd" id="7_detec"]
 
 [sub_resource type="Resource" id="Resource_fwm4w"]
 resource_local_to_scene = true
@@ -21,10 +22,21 @@ script = ExtResource("4_esq1v")
 [sub_resource type="Resource" id="Resource_seek"]
 resource_local_to_scene = true
 script = ExtResource("5_seek")
+arrive_slowing_radius = 50.0
 
 [sub_resource type="Resource" id="Resource_flee"]
 resource_local_to_scene = true
 script = ExtResource("6_flee")
+distancia_segura = 100.0
+
+[sub_resource type="Resource" id="Resource_2hn1t"]
+resource_local_to_scene = true
+script = ExtResource("7_detec")
+mascara_obstaculos = 6
+distancia_anticipacion = 20.0
+distancia_verificacion_paso = 10.0
+grupos_obstaculos = Array[StringName]([&"Obstaculos"])
+grupos_paredes = Array[StringName]([&"Pared"])
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_body"]
 radius = 11.0
@@ -45,7 +57,8 @@ componente_wander = SubResource("Resource_fwm4w")
 componente_esquiva = SubResource("Resource_u22gi")
 componente_seek = SubResource("Resource_seek")
 componente_flee = SubResource("Resource_flee")
-tiempo_min_esquivando = 0.1
+componente_detector = SubResource("Resource_2hn1t")
+tiempo_min_esquivando = 0.01
 tiempo_max_esquivando = 3.0
 distancia_anticipacion_obstaculo = 40.0
 area_grande = NodePath("AreaGrande")
@@ -78,39 +91,39 @@ shape = SubResource("CircleShape2D_chica")
 [node name="Casters" type="Node2D" parent="." unique_id=568049083]
 
 [node name="RC_0" type="RayCast2D" parent="Casters" unique_id=186551935]
-target_position = Vector2(157, 0)
+target_position = Vector2(141, -1)
 collision_mask = 7
 
 [node name="RayCast2D" type="RayCast2D" parent="Casters" unique_id=906100949]
-target_position = Vector2(128, -35)
+target_position = Vector2(97, -25)
 collision_mask = 7
 
 [node name="RayCast2D6" type="RayCast2D" parent="Casters" unique_id=1237436373]
-target_position = Vector2(121, 34)
+target_position = Vector2(98, 22)
 collision_mask = 7
 
 [node name="RayCast2D2" type="RayCast2D" parent="Casters" unique_id=1527722968]
-target_position = Vector2(91, -55)
+target_position = Vector2(67, -41)
 collision_mask = 7
 
 [node name="RayCast2D7" type="RayCast2D" parent="Casters" unique_id=1069773876]
-target_position = Vector2(71, 53)
+target_position = Vector2(68, 44)
 collision_mask = 7
 
 [node name="RayCast2D3" type="RayCast2D" parent="Casters" unique_id=1227033834]
-target_position = Vector2(44, -62)
+target_position = Vector2(35, -45)
 collision_mask = 7
 
 [node name="RayCast2D8" type="RayCast2D" parent="Casters" unique_id=209592470]
-target_position = Vector2(26, 64)
+target_position = Vector2(28, 44)
 collision_mask = 7
 
 [node name="RayCast2D4" type="RayCast2D" parent="Casters" unique_id=779167037]
-target_position = Vector2(0, -66)
+target_position = Vector2(0, -42)
 collision_mask = 7
 
 [node name="RayCast2D9" type="RayCast2D" parent="Casters" unique_id=11002138]
-target_position = Vector2(0, 69)
+target_position = Vector2(0, 42)
 collision_mask = 7
 
 [node name="RC_180" type="RayCast2D" parent="Casters" unique_id=400760096]
