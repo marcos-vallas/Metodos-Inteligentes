@@ -11,7 +11,10 @@ enum State {
 
 
 var state : State = State.STATE_1
-var motion : Vector2 =Vector2.ZERO
+var motion : Vector2 = Vector2.ZERO
+
+func _init() -> void:
+	resource_local_to_scene = true
 
 func check_motion():
 	if motion != Vector2.ZERO and state == State.STATE_1:

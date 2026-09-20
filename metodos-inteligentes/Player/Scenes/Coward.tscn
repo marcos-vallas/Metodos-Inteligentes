@@ -1,26 +1,42 @@
-[gd_scene format=3 uid="uid://byfxamot0rw4w"]
+[gd_scene format=3 uid="uid://bmt3funrklq31"]
 
-[ext_resource type="Texture2D" uid="uid://bm4ks004hqpsc" path="res://Player/Assets/Warrior_Blue.png" id="1_o8dxp"]
-[ext_resource type="Script" uid="uid://domc4hinxbkuv" path="res://Player/Scenes/player.gd" id="1_yrefi"]
-[ext_resource type="Script" uid="uid://bghadbdk1uui0" path="res://Player/Scripts/movement_component.gd" id="2_ffv5t"]
-[ext_resource type="Script" uid="uid://bvlh8detick8e" path="res://Player/Scripts/state_component.gd" id="3_qknkb"]
-[ext_resource type="Script" uid="uid://03le87n0pah5" path="res://Player/Scripts/animation_component.gd" id="4_o00bb"]
+[ext_resource type="Script" uid="uid://ba48neba8i2sb" path="res://Player/Scenes/Base/Agente_Animado.gd" id="1_88pxm"]
+[ext_resource type="Script" uid="uid://bvlh8detick8e" path="res://Player/Scripts/state_component.gd" id="3_gs4qw"]
+[ext_resource type="Script" uid="uid://03le87n0pah5" path="res://Player/Scripts/animation_component.gd" id="4_8gnhb"]
+[ext_resource type="Script" uid="uid://cuvjqo3wnfjja" path="res://Enemigos/scripts/wander_comp.gd" id="4_88pxm"]
+[ext_resource type="Script" uid="uid://bxrgdr67y0b6c" path="res://Enemigos/scripts/esquiva_comp.gd" id="5_b028r"]
+[ext_resource type="Texture2D" uid="uid://dnuw8mqc0la2n" path="res://Resources/Factions/Knights/Troops/Pawn/Purple/Pawn_Purple.png" id="5_jbxnc"]
+[ext_resource type="Script" uid="uid://c31h4fw5mvib6" path="res://Enemigos/scripts/flee_comp.gd" id="6_rpxw3"]
+[ext_resource type="Script" uid="uid://dwb4022gfdnlf" path="res://Enemigos/scripts/detector_obstaculos_comp.gd" id="7_4mgkh"]
 
-[sub_resource type="Resource" id="Resource_ffv5t"]
-script = ExtResource("2_ffv5t")
-metadata/_custom_type_script = "uid://bghadbdk1uui0"
-
-[sub_resource type="Resource" id="Resource_o00bb"]
-script = ExtResource("3_qknkb")
+[sub_resource type="Resource" id="Resource_84m1l"]
+script = ExtResource("3_gs4qw")
 metadata/_custom_type_script = "uid://bvlh8detick8e"
 
-[sub_resource type="Resource" id="Resource_ubvuf"]
-script = ExtResource("4_o00bb")
+[sub_resource type="Resource" id="Resource_toci6"]
+script = ExtResource("4_8gnhb")
 metadata/_custom_type_script = "uid://03le87n0pah5"
 
+[sub_resource type="Resource" id="Resource_x6a2i"]
+script = ExtResource("4_88pxm")
+metadata/_custom_type_script = "uid://cuvjqo3wnfjja"
+
+[sub_resource type="Resource" id="Resource_jbxnc"]
+script = ExtResource("5_b028r")
+metadata/_custom_type_script = "uid://bxrgdr67y0b6c"
+
+[sub_resource type="Resource" id="Resource_31flj"]
+script = ExtResource("6_rpxw3")
+metadata/_custom_type_script = "uid://c31h4fw5mvib6"
+
+[sub_resource type="Resource" id="Resource_ghlvg"]
+script = ExtResource("7_4mgkh")
+variacion_angulo_pared = 45.0
+metadata/_custom_type_script = "uid://dwb4022gfdnlf"
+
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_7jgbj"]
-radius = 23.333332
-height = 80.0
+radius = 15.0
+height = 42.0
 
 [sub_resource type="Animation" id="Animation_ffv5t"]
 length = 0.001
@@ -223,32 +239,40 @@ states/run/node = SubResource("AnimationNodeAnimation_qknkb")
 states/run/position = Vector2(658, 115)
 transitions = ["Start", "idle", SubResource("AnimationNodeStateMachineTransition_o00bb"), "idle", "run", SubResource("AnimationNodeStateMachineTransition_l6m33"), "run", "idle", SubResource("AnimationNodeStateMachineTransition_gs3kl"), "idle", "anim1", SubResource("AnimationNodeStateMachineTransition_03qnj"), "anim1", "idle", SubResource("AnimationNodeStateMachineTransition_qw2rl")]
 
-[node name="Player" type="CharacterBody2D" unique_id=763683405 node_paths=PackedStringArray("animation_tree") groups=["Player"]]
-scale = Vector2(0.3, 0.3)
-collision_layer = 8
-collision_mask = 247
-slide_on_ceiling = false
+[sub_resource type="CircleShape2D" id="CircleShape2D_88pxm"]
+radius = 248.00201
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_b028r"]
+radius = 35.014282
+
+[node name="Coward" type="CharacterBody2D" unique_id=763683405 node_paths=PackedStringArray("animation_tree", "sprite_character", "area_grande", "area_chica", "casters") groups=["NPC"]]
+collision_layer = 16
+collision_mask = 7
 platform_floor_layers = 4294967041
 platform_wall_layers = 2
-script = ExtResource("1_yrefi")
-movement_comp = SubResource("Resource_ffv5t")
-state_comp = SubResource("Resource_o00bb")
+script = ExtResource("1_88pxm")
+state_comp = SubResource("Resource_84m1l")
 animation_tree = NodePath("AnimationTree")
-animation_comp = SubResource("Resource_ubvuf")
+animation_comp = SubResource("Resource_toci6")
+sprite_character = NodePath("WarriorBlue")
+tipo_npc = 2
+componente_wander = SubResource("Resource_x6a2i")
+componente_esquiva = SubResource("Resource_jbxnc")
+componente_flee = SubResource("Resource_31flj")
+componente_detector = SubResource("Resource_ghlvg")
+area_grande = NodePath("AreaGrande")
+area_chica = NodePath("AreaChica")
+casters = NodePath("Casters")
 
 [node name="WarriorBlue" type="Sprite2D" parent="." unique_id=1306866681]
-position = Vector2(0, -30)
-texture = ExtResource("1_o8dxp")
+scale = Vector2(0.845, 0.845)
+texture = ExtResource("5_jbxnc")
 hframes = 6
-vframes = 8
+vframes = 6
 frame = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1848096300]
-position = Vector2(0, -30)
 shape = SubResource("CapsuleShape2D_7jgbj")
-
-[node name="Camera2D" type="Camera2D" parent="." unique_id=288863861]
-zoom = Vector2(1.63, 1.63)
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=422067489]
 libraries/ = SubResource("AnimationLibrary_03qnj")
@@ -256,3 +280,77 @@ libraries/ = SubResource("AnimationLibrary_03qnj")
 [node name="AnimationTree" type="AnimationTree" parent="." unique_id=1199443386]
 tree_root = SubResource("AnimationNodeStateMachine_qknkb")
 anim_player = NodePath("../AnimationPlayer")
+
+[node name="AreaGrande" type="Area2D" parent="." unique_id=1507287716]
+collision_layer = 0
+collision_mask = 8
+
+[node name="areachica" type="CollisionShape2D" parent="AreaGrande" unique_id=1891630707]
+shape = SubResource("CircleShape2D_88pxm")
+
+[node name="AreaChica" type="Area2D" parent="." unique_id=74303632]
+collision_layer = 0
+collision_mask = 6
+
+[node name="areagrande" type="CollisionShape2D" parent="AreaChica" unique_id=1413719248]
+shape = SubResource("CircleShape2D_b028r")
+
+[node name="Casters" type="Node2D" parent="." unique_id=848589512]
+
+[node name="RC_0" type="RayCast2D" parent="Casters" unique_id=1609297571]
+target_position = Vector2(99, 0)
+collision_mask = 7
+
+[node name="RayCast2D" type="RayCast2D" parent="Casters" unique_id=1860847948]
+target_position = Vector2(81, -24)
+collision_mask = 7
+
+[node name="RayCast2D6" type="RayCast2D" parent="Casters" unique_id=1193470101]
+position = Vector2(-18, 1)
+target_position = Vector2(98, 22)
+collision_mask = 7
+
+[node name="RayCast2D2" type="RayCast2D" parent="Casters" unique_id=288567493]
+target_position = Vector2(46, -36)
+collision_mask = 7
+
+[node name="RayCast2D5" type="RayCast2D" parent="Casters" unique_id=1305608776]
+target_position = Vector2(20, -43)
+collision_mask = 7
+
+[node name="RayCast2D11" type="RayCast2D" parent="Casters" unique_id=1062515451]
+target_position = Vector2(20, -43)
+collision_mask = 7
+
+[node name="RayCast2D7" type="RayCast2D" parent="Casters" unique_id=1386647009]
+target_position = Vector2(51, 45)
+collision_mask = 7
+
+[node name="RayCast2D10" type="RayCast2D" parent="Casters" unique_id=23237854]
+target_position = Vector2(18, 43)
+collision_mask = 7
+
+[node name="RayCast2D3" type="RayCast2D" parent="Casters" unique_id=962353417]
+target_position = Vector2(0, -47)
+collision_mask = 7
+
+[node name="RayCast2D8" type="RayCast2D" parent="Casters" unique_id=1055610763]
+target_position = Vector2(0, 45)
+collision_mask = 7
+
+[node name="RayCast2D4" type="RayCast2D" parent="Casters" unique_id=632705843]
+target_position = Vector2(-18, -43)
+collision_mask = 7
+
+[node name="RayCast2D9" type="RayCast2D" parent="Casters" unique_id=1767009695]
+target_position = Vector2(-20, 41)
+collision_mask = 7
+
+[node name="RC_180" type="RayCast2D" parent="Casters" unique_id=399448475]
+target_position = Vector2(-53, 0)
+collision_mask = 7
+
+[node name="Line2D" type="Line2D" parent="Casters" unique_id=2086306880]
+visible = false
+points = PackedVector2Array(-92, -1, 78, -51, 157, 0, 68, 50, -92, -1)
+default_color = Color(1, 0.53333336, 1, 0.36078432)

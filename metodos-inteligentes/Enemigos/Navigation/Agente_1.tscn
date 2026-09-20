@@ -1,0 +1,56 @@
+[gd_scene format=3 uid="uid://dw2paw7ntrwdl"]
+
+[ext_resource type="Script" uid="uid://2c2e652li1yc" path="res://Enemigos/Navigation/agente_1.gd" id="1_1jfwh"]
+[ext_resource type="Texture2D" uid="uid://cr00kdxrn4b42" path="res://Resources/Factions/Knights/Troops/Warrior/Red/Warrior_Red.png" id="1_b0tub"]
+[ext_resource type="Script" uid="uid://bghadbdk1uui0" path="res://Player/Scripts/movement_component.gd" id="2_bhbn2"]
+
+[sub_resource type="Resource" id="Resource_8jxof"]
+script = ExtResource("2_bhbn2")
+speed = 41
+metadata/_custom_type_script = "uid://bghadbdk1uui0"
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_bsbiv"]
+radius = 25.0
+height = 80.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_s6aa6"]
+radius = 110.85
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_deteccion"]
+radius = 367.00546
+
+[node name="Agente1" type="CharacterBody2D" unique_id=594747415 node_paths=PackedStringArray("caster", "area_deteccion")]
+collision_layer = 16
+collision_mask = 7
+script = ExtResource("1_1jfwh")
+componente_movimento = SubResource("Resource_8jxof")
+caster = NodePath("ShapeCast2D")
+area_deteccion = NodePath("AreaDeteccion")
+radio_zona_objetivo = 38.845
+tiempo_max_en_punto = 10.0
+arrive_slowing_radius = 100.0
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1455571795]
+texture = ExtResource("1_b0tub")
+hframes = 6
+vframes = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1224381657]
+shape = SubResource("CapsuleShape2D_bsbiv")
+
+[node name="ShapeCast2D" type="ShapeCast2D" parent="." unique_id=1184738695]
+modulate = Color(1.5369638, 1.1163658, 0.19752064, 0.42352942)
+shape = SubResource("CircleShape2D_s6aa6")
+target_position = Vector2(120, 0)
+collision_mask = 7
+
+[node name="AreaDeteccion" type="Area2D" parent="." unique_id=234891234]
+collision_layer = 0
+collision_mask = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaDeteccion" unique_id=892347123]
+shape = SubResource("CircleShape2D_deteccion")
+debug_color = Color(0, 0.6, 0.69803923, 0.25882354)
+
+[connection signal="body_entered" from="AreaDeteccion" to="." method="_on_area_deteccion_body_entered"]
+[connection signal="body_exited" from="AreaDeteccion" to="." method="_on_area_deteccion_body_exited"]

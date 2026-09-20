@@ -1,4 +1,5 @@
 extends CharacterBody2D
+class_name Player1
 
 @export_category("Components")
 @export var movement_comp : MovementComponent
@@ -7,13 +8,8 @@ extends CharacterBody2D
 @export var animation_tree : AnimationTree #= $AnimationTree
 @export var animation_comp : AnimationComponent
 
-
-
-
-
 func _ready() -> void:
 	animation_comp.setup(animation_tree) 
-	
 	
 	
 func _physics_process(delta: float) -> void:
@@ -21,6 +17,7 @@ func _physics_process(delta: float) -> void:
 	state_loop()
 	animation_loop()
 	flip_h_loop()
+	
 	
 # Component calling
 func movement_loop() -> void:
