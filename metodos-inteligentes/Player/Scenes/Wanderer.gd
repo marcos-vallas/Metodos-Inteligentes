@@ -1,12 +1,13 @@
 extends CharacterBody2D
-class_name Player1
 
 @export_category("Components")
 @export var movement_comp : MovementComponent
 @export var state_comp : StateComponent
+
 @export_category("Animation")
 @export var animation_tree : AnimationTree #= $AnimationTree
 @export var animation_comp : AnimationComponent
+@onready var raycast = $RayCastCentral
 
 func _ready() -> void:
 	animation_comp.setup(animation_tree) 
@@ -18,10 +19,10 @@ func _physics_process(delta: float) -> void:
 	animation_loop()
 	flip_h_loop()
 	
-	
 # Component calling
 func movement_loop() -> void:
-	self.velocity = movement_comp.get_motion()
+	# El Wanderer simplemente hace Wander sin verse afectado por el jugador.
+	self.velocity = movement_comp.wander(global_position, movement_comp.move_direction, raycast)
 	self.move_and_slide()
 	
 func state_loop() -> void:
