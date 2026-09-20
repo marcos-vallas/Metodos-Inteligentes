@@ -13,9 +13,8 @@ angulo_min_variacion = 8.5
 angulo_max_variacion = 53.5
 metadata/_custom_type_script = "uid://cuvjqo3wnfjja"
 
-[sub_resource type="Resource" id="Resource_esquiva"]
+[sub_resource type="Resource" id="Resource_u22gi"]
 script = ExtResource("4_esq1v")
-suavizado = 9.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_body"]
 radius = 11.0
@@ -31,8 +30,10 @@ radius = 23.021729
 collision_layer = 16
 collision_mask = 7
 script = ExtResource("1_xb1s8")
+tipo_npc = 1
 componente_wander = SubResource("Resource_fwm4w")
-componente_esquiva = SubResource("Resource_esquiva")
+componente_esquiva = SubResource("Resource_u22gi")
+distancia_anticipacion_obstaculo = 40.0
 area_grande = NodePath("AreaGrande")
 area_chica = NodePath("AreaChica")
 casters = NodePath("Casters")
@@ -99,7 +100,7 @@ target_position = Vector2(0, 69)
 collision_mask = 7
 
 [node name="RC_180" type="RayCast2D" parent="Casters" unique_id=400760096]
-target_position = Vector2(-102, 0)
+target_position = Vector2(-53, 0)
 collision_mask = 7
 
 [node name="Line2D" type="Line2D" parent="Casters" unique_id=1296252352]

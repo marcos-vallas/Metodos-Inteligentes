@@ -4,14 +4,32 @@
 [ext_resource type="PackedScene" uid="uid://byfxamot0rw4w" path="res://Player/Scenes/Player.tscn" id="2_ubvuf"]
 [ext_resource type="PackedScene" uid="uid://wxpcc7lpsdn6" path="res://Enemigos/Navigation/Agente_3.tscn" id="4_6xqqw"]
 [ext_resource type="Script" uid="uid://cuvjqo3wnfjja" path="res://Enemigos/scripts/wander_comp.gd" id="4_8jxof"]
+[ext_resource type="Script" uid="uid://bxrgdr67y0b6c" path="res://Enemigos/scripts/esquiva_comp.gd" id="5_8jxof"]
+
+[sub_resource type="Resource" id="Resource_yl6o2"]
+script = ExtResource("4_8jxof")
+metadata/_custom_type_script = "uid://cuvjqo3wnfjja"
+
+[sub_resource type="Resource" id="Resource_11m7y"]
+script = ExtResource("5_8jxof")
 
 [sub_resource type="Resource" id="Resource_6xqqw"]
 resource_local_to_scene = true
 script = ExtResource("4_8jxof")
-tiempo_movimiento = 5.6
-angulo_min_variacion = 59.5
-angulo_max_variacion = 103.5
+tiempo_movimiento = 8.9
+angulo_min_variacion = 8.5
+angulo_max_variacion = 53.5
 metadata/_custom_type_script = "uid://cuvjqo3wnfjja"
+
+[sub_resource type="Resource" id="Resource_hcxiy"]
+script = ExtResource("5_8jxof")
+
+[sub_resource type="Resource" id="Resource_otorl"]
+script = ExtResource("4_8jxof")
+metadata/_custom_type_script = "uid://cuvjqo3wnfjja"
+
+[sub_resource type="Resource" id="Resource_lrlib"]
+script = ExtResource("5_8jxof")
 
 [node name="Screen1" type="Node2D" unique_id=312666599]
 
@@ -23,4 +41,32 @@ collision_mask = 7
 
 [node name="Agente3" parent="." unique_id=1056296151 instance=ExtResource("4_6xqqw")]
 position = Vector2(447, 555)
+tipo_npc = 0
+componente_wander = SubResource("Resource_yl6o2")
+componente_esquiva = SubResource("Resource_11m7y")
+
+[node name="Label" type="Label" parent="Agente3" unique_id=641638238]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Wander"
+
+[node name="Agente4" parent="." unique_id=987654321 instance=ExtResource("4_6xqqw")]
+position = Vector2(407, 412)
 componente_wander = SubResource("Resource_6xqqw")
+componente_esquiva = SubResource("Resource_hcxiy")
+
+[node name="Label" type="Label" parent="Agente4" unique_id=574227626]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Seeker"
+
+[node name="Agente5" parent="." unique_id=1832309522 instance=ExtResource("4_6xqqw")]
+position = Vector2(896, 421)
+tipo_npc = 2
+componente_wander = SubResource("Resource_otorl")
+componente_esquiva = SubResource("Resource_lrlib")
+
+[node name="Label" type="Label" parent="Agente5" unique_id=2109901753]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Flee"
