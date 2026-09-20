@@ -23,9 +23,11 @@ enum Estado {
 @export_category("Configuración General")
 @export var tipo_npc: TipoNPC = TipoNPC.WANDERER: set = set_tipo_npc
 
-@export var componente_movimento: MovementComponent
+@export_category("Componentes")
 @export var componente_wander: WanderComponent
 @export var componente_esquiva: EsquivaComponent
+@export var componente_seek: SeekComponent
+@export var componente_flee: FleeComponent
 
 @export_category("Evasión de Obstáculos")
 ## Tiempo mínimo que permanece en estado de esquiva para evitar cancelaciones prematuras u oscilaciones
@@ -172,7 +174,7 @@ func hay_obstaculo_anticipado() -> bool:
 		return false
 	
 	# Cono frontal: RC_0 (0°) y rayos inmediatos ±15° (índices 0, 1 y 2)
-	var indices_cono_frontal: Array[int] = [0, 1, 2, 3, 4, 5, 6]
+	var indices_cono_frontal: Array[int] = [0, 1, 2, 3, 4]
 	for idx in indices_cono_frontal:
 		if idx < casters.get_child_count():
 			var rc = casters.get_child(idx)
@@ -487,9 +489,12 @@ func actualizar_direccion_evasion() -> void:
 func procesar_comportamiento(delta: float = 0.0) -> void:
 	# Detección anticipada de obstáculos por raycasts cuando no se está esquivando
 	if estado_actual != Estado.ESQUIVANDO:
-		var ya_llego_al_player: bool = (tipo_npc == TipoNPC.SEEKER and objetivo_player != null 
-			and is_instance_valid(objetivo_player) 
-			and global_position.distance_to(objetivo_player.global_position) <= arrive_stop_radius)
+		var ya_llego_al_player: bool = false
+		if tipo_npc == TipoNPC.SEEKER and objetivo_player != null and is_instance_valid(objetivo_player):
+			if componente_seek:
+				ya_llego_al_player = componente_seek.ha_llegado(global_position, objetivo_player.global_position)
+			else:
+				ya_llego_al_player = global_position.distance_to(objetivo_player.global_position) <= arrive_stop_radius
 		
 		if not ya_llego_al_player and hay_obstaculo_anticipado():
 			iniciar_esquiva()
@@ -520,21 +525,27 @@ func procesar_comportamiento(delta: float = 0.0) -> void:
 			if objetivo_player == null or not is_instance_valid(objetivo_player):
 				estado_actual = Estado.WANDER
 				return
-			var a_player: Vector2 = objetivo_player.global_position - global_position
-			if a_player.length() <= arrive_stop_radius:
-				velocity = Vector2.ZERO
+			if componente_seek:
+				velocity = componente_seek.calcular_velocidad(global_position, objetivo_player.global_position, delta)
 			else:
-				var dir_seek: Vector2 = a_player.normalized()
-				if componente_esquiva:
-					velocity = componente_esquiva.esquivar(dir_seek, delta)
+				var a_player: Vector2 = objetivo_player.global_position - global_position
+				if a_player.length() <= arrive_stop_radius:
+					velocity = Vector2.ZERO
 				else:
-					velocity = dir_seek * 70.0
+					var dir_seek: Vector2 = a_player.normalized()
+					if componente_esquiva:
+						velocity = componente_esquiva.esquivar(dir_seek, delta)
+					else:
+						velocity = dir_seek * 70.0
 		Estado.FLEE:
 			if objetivo_player == null or not is_instance_valid(objetivo_player):
 				estado_actual = Estado.WANDER
 				return
-			var dir_flee: Vector2 = (global_position - objetivo_player.global_position).normalized()
-			if componente_esquiva:
-				velocity = componente_esquiva.esquivar(dir_flee, delta)
+			if componente_flee:
+				velocity = componente_flee.calcular_velocidad(global_position, objetivo_player.global_position, delta)
 			else:
-				velocity = dir_flee * 70.0
+				var dir_flee: Vector2 = (global_position - objetivo_player.global_position).normalized()
+				if componente_esquiva:
+					velocity = componente_esquiva.esquivar(dir_flee, delta)
+				else:
+					velocity = dir_flee * 70.0

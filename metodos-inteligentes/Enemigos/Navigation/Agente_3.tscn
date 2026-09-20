@@ -4,6 +4,8 @@
 [ext_resource type="Texture2D" uid="uid://cr00kdxrn4b42" path="res://Resources/Factions/Knights/Troops/Warrior/Red/Warrior_Red.png" id="3_0ex3w"]
 [ext_resource type="Script" uid="uid://cuvjqo3wnfjja" path="res://Enemigos/scripts/wander_comp.gd" id="3_u22gi"]
 [ext_resource type="Script" uid="uid://bxrgdr67y0b6c" path="res://Enemigos/scripts/esquiva_comp.gd" id="4_esq1v"]
+[ext_resource type="Script" uid="uid://dn0iio8bis808" path="res://Enemigos/scripts/seek_comp.gd" id="5_seek"]
+[ext_resource type="Script" uid="uid://c31h4fw5mvib6" path="res://Enemigos/scripts/flee_comp.gd" id="6_flee"]
 
 [sub_resource type="Resource" id="Resource_fwm4w"]
 resource_local_to_scene = true
@@ -15,6 +17,14 @@ metadata/_custom_type_script = "uid://cuvjqo3wnfjja"
 
 [sub_resource type="Resource" id="Resource_u22gi"]
 script = ExtResource("4_esq1v")
+
+[sub_resource type="Resource" id="Resource_seek"]
+resource_local_to_scene = true
+script = ExtResource("5_seek")
+
+[sub_resource type="Resource" id="Resource_flee"]
+resource_local_to_scene = true
+script = ExtResource("6_flee")
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_body"]
 radius = 11.0
@@ -33,6 +43,10 @@ script = ExtResource("1_xb1s8")
 tipo_npc = 1
 componente_wander = SubResource("Resource_fwm4w")
 componente_esquiva = SubResource("Resource_u22gi")
+componente_seek = SubResource("Resource_seek")
+componente_flee = SubResource("Resource_flee")
+tiempo_min_esquivando = 0.1
+tiempo_max_esquivando = 3.0
 distancia_anticipacion_obstaculo = 40.0
 area_grande = NodePath("AreaGrande")
 area_chica = NodePath("AreaChica")
