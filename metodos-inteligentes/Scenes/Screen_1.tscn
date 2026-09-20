@@ -8,6 +8,9 @@
 [ext_resource type="Script" uid="uid://dn0iio8bis808" path="res://Enemigos/scripts/seek_comp.gd" id="6_otorl"]
 [ext_resource type="Script" uid="uid://c31h4fw5mvib6" path="res://Enemigos/scripts/flee_comp.gd" id="7_lrlib"]
 [ext_resource type="Script" uid="uid://dwb4022gfdnlf" path="res://Enemigos/scripts/detector_obstaculos_comp.gd" id="8_hcxiy"]
+[ext_resource type="PackedScene" uid="uid://c4fgm3atd851i" path="res://Player/Scenes/Wanderer.tscn" id="9_lrlib"]
+[ext_resource type="PackedScene" uid="uid://bmt3funrklq31" path="res://Player/Scenes/Coward.tscn" id="10_yl6o2"]
+[ext_resource type="PackedScene" uid="uid://cfvtef543ag2t" path="res://Player/Scenes/Chaser.tscn" id="11_11m7y"]
 
 [sub_resource type="Resource" id="Resource_d7aw2"]
 script = ExtResource("4_8jxof")
@@ -71,10 +74,13 @@ metadata/_custom_type_script = "uid://dwb4022gfdnlf"
 [node name="Escenario2D" parent="." unique_id=592091555 instance=ExtResource("1_6xqqw")]
 
 [node name="Player" parent="." unique_id=763683405 instance=ExtResource("2_ubvuf")]
-position = Vector2(170, 188)
+position = Vector2(269, 613)
 collision_mask = 7
 
-[node name="Agente3" parent="." unique_id=1056296151 instance=ExtResource("4_6xqqw")]
+[node name="Unskinned" type="Node2D" parent="." unique_id=509226854]
+visible = false
+
+[node name="Agente3" parent="Unskinned" unique_id=1056296151 instance=ExtResource("4_6xqqw")]
 position = Vector2(447, 555)
 tipo_npc = 0
 componente_wander = SubResource("Resource_d7aw2")
@@ -83,12 +89,12 @@ componente_seek = SubResource("Resource_wthak")
 componente_flee = SubResource("Resource_lnwmv")
 componente_detector = SubResource("Resource_bjww6")
 
-[node name="Label" type="Label" parent="Agente3" unique_id=641638238]
+[node name="Label" type="Label" parent="Unskinned/Agente3" unique_id=641638238]
 offset_right = 40.0
 offset_bottom = 23.0
 text = "Wander"
 
-[node name="Agente4" parent="." unique_id=987654321 instance=ExtResource("4_6xqqw")]
+[node name="Agente4" parent="Unskinned" unique_id=987654321 instance=ExtResource("4_6xqqw")]
 position = Vector2(407, 412)
 componente_wander = SubResource("Resource_30k8b")
 componente_esquiva = SubResource("Resource_s4i54")
@@ -96,12 +102,12 @@ componente_seek = SubResource("Resource_eis53")
 componente_flee = SubResource("Resource_ma0n4")
 componente_detector = SubResource("Resource_j7u55")
 
-[node name="Label" type="Label" parent="Agente4" unique_id=574227626]
+[node name="Label" type="Label" parent="Unskinned/Agente4" unique_id=574227626]
 offset_right = 40.0
 offset_bottom = 23.0
 text = "Seeker"
 
-[node name="Agente5" parent="." unique_id=1832309522 instance=ExtResource("4_6xqqw")]
+[node name="Agente5" parent="Unskinned" unique_id=1832309522 instance=ExtResource("4_6xqqw")]
 position = Vector2(896, 421)
 tipo_npc = 2
 componente_wander = SubResource("Resource_6scup")
@@ -110,7 +116,42 @@ componente_seek = SubResource("Resource_3nf4l")
 componente_flee = SubResource("Resource_jc22d")
 componente_detector = SubResource("Resource_hacjn")
 
-[node name="Label" type="Label" parent="Agente5" unique_id=2109901753]
+[node name="Label" type="Label" parent="Unskinned/Agente5" unique_id=2109901753]
 offset_right = 40.0
 offset_bottom = 23.0
 text = "Flee"
+
+[node name="Skinned" type="Node2D" parent="." unique_id=1497558248]
+
+[node name="Coward" parent="Skinned" unique_id=1275044264 instance=ExtResource("10_yl6o2")]
+position = Vector2(440, 574)
+scale = Vector2(0.45, 0.45)
+
+[node name="Label" type="Label" parent="Skinned/Coward" unique_id=1878591500]
+offset_left = -18.0
+offset_top = -50.0
+offset_right = 22.0
+offset_bottom = -27.0
+text = "Flee"
+
+[node name="Chaser" parent="Skinned" unique_id=428036649 instance=ExtResource("11_11m7y")]
+position = Vector2(162, 517)
+scale = Vector2(0.45, 0.45)
+
+[node name="Label" type="Label" parent="Skinned/Chaser" unique_id=375212575]
+offset_left = -28.0
+offset_top = -60.0
+offset_right = 25.0
+offset_bottom = -37.0
+text = "Seeker"
+
+[node name="Wanderer2" parent="Skinned" unique_id=411690089 instance=ExtResource("9_lrlib")]
+position = Vector2(404, 728)
+scale = Vector2(0.45, 0.45)
+
+[node name="Label" type="Label" parent="Skinned/Wanderer2" unique_id=1115098020]
+offset_left = -32.0
+offset_top = -60.0
+offset_right = 29.0
+offset_bottom = -37.0
+text = "Wander"

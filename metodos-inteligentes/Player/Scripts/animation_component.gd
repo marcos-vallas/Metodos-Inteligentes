@@ -10,19 +10,19 @@ var animation_playback : AnimationNodeStateMachinePlayback
 	StateComponent.State.STATE_2 : "run"
 }
 
+func _init() -> void:
+	resource_local_to_scene = true
+
 func setup(tree: AnimationTree) -> void:
 	animation_tree = tree
-	animation_playback = tree["parameters/playback"]
+	if animation_tree:
+		animation_tree.active = true
+		animation_playback = tree["parameters/playback"]
 	
 func travel_state(state: String) -> void:
 	if animation_playback:
 		animation_playback.travel(state)
 
-func play_State(state:StateComponent.State) -> void:
-	match state:
-		StateComponent.State.STATE_1:
-			travel_state(state_to_animation[state])
-		StateComponent.State.STATE_2:
-			travel_state(state_to_animation[state])
-		StateComponent.State.STATE_3:
-			travel_state(state_to_animation[state])
+func play_State(state: StateComponent.State) -> void:
+	if state in state_to_animation:
+		travel_state(state_to_animation[state])

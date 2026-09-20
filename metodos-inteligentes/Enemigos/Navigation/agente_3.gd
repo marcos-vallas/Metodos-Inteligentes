@@ -34,7 +34,7 @@ enum Estado {
 @export var area_grande: Area2D    ## Sensor de Percepción (detecta al Jugador)
 @export var area_chica: Area2D     ## Sensor de Proximidad (detecta obstáculos cercanos)
 @export var casters: Node2D        ## Contenedor de RayCast2D direccionales
-@onready var sprite: Sprite2D = $Sprite2D
+@onready var sprite: Sprite2D
 
 @export_category("Visual Debug")
 @export var debug_draw: bool = true
@@ -83,9 +83,10 @@ func _ready() -> void:
 	set_tipo_npc(tipo_npc)
 
 func _physics_process(delta: float) -> void:
-	# 1. Alinear el contenedor de sensores con la dirección de movimiento
-	if casters and velocity.length_squared() > 1.0:
-		casters.rotation = velocity.angle()
+	# 1. Alinear el contenedor de sensores con la dirección deseada del agente hacia el objetivo
+	var dir_deseada: Vector2 = obtener_direccion_deseada()
+	if casters and dir_deseada != Vector2.ZERO:
+		casters.rotation = dir_deseada.angle()
 	
 	# 2. Actualizar raycasts sensoriales
 	if componente_detector:
@@ -96,16 +97,9 @@ func _physics_process(delta: float) -> void:
 	
 	# 4. Movimiento físico
 	move_and_slide()
-
-func _process(_delta: float) -> void:
-	actualizar_orientacion_sprite()
-
-func actualizar_orientacion_sprite() -> void:
-	if sprite:
-		if velocity.x < -1.0:
-			sprite.flip_h = true
-		elif velocity.x > 1.0:
-			sprite.flip_h = false
+	
+	if debug_draw:
+		queue_redraw()
 
 #region Transiciones de Estado de Evasión (FSM)
 func iniciar_esquiva() -> void:
@@ -131,6 +125,26 @@ func obtener_direccion_amenaza() -> Vector2:
 	if tipo_npc == TipoNPC.FLEEKER and objetivo_player and is_instance_valid(objetivo_player):
 		return (objetivo_player.global_position - global_position).normalized()
 	return Vector2.ZERO
+
+func obtener_direccion_deseada() -> Vector2:
+	match tipo_npc:
+		TipoNPC.SEEKER:
+			if objetivo_player and is_instance_valid(objetivo_player):
+				var offset: Vector2 = objetivo_player.global_position - global_position
+				if offset.length_squared() > 1.0:
+					return offset.normalized()
+		TipoNPC.FLEEKER:
+			if objetivo_player and is_instance_valid(objetivo_player):
+				var offset: Vector2 = global_position - objetivo_player.global_position
+				if offset.length_squared() > 1.0:
+					return offset.normalized()
+		TipoNPC.WANDERER:
+			if componente_wander and componente_wander.direccion_objetivo != Vector2.ZERO:
+				return componente_wander.direccion_objetivo.normalized()
+	
+	if velocity.length_squared() > 1.0:
+		return velocity.normalized()
+	return Vector2.RIGHT
 #endregion
 
 #region Máquina de Estados y Comportamiento
@@ -157,11 +171,12 @@ func procesar_comportamiento(delta: float = 0.0) -> void:
 				return
 				
 			var dir_amenaza: Vector2 = obtener_direccion_amenaza()
+			var dir_deseada: Vector2 = obtener_direccion_deseada()
 			var fallback_wander: Vector2 = componente_wander.direccion_objetivo if componente_wander else Vector2.ZERO
 			
-			# Delegación completa de la maniobra al EsquivaComponent
+			# Delegación completa de la maniobra al EsquivaComponent con direccion_deseada
 			velocity = componente_esquiva.procesar_maniobra(
-				self, delta, componente_detector, casters, area_chica, obstaculos_en_rango, dir_amenaza, fallback_wander
+				self, delta, componente_detector, casters, area_chica, obstaculos_en_rango, dir_amenaza, fallback_wander, dir_deseada
 			)
 			
 			# Sincronización de rumbo en Wander si se bordea o despega de una pared
@@ -251,5 +266,8 @@ func _on_area_chica_body_exited(body: Node2D) -> void:
 #region Visual Debug
 func _draw() -> void:
 	if debug_draw and componente_detector:
-		draw_line(Vector2.ZERO, componente_detector.ultimo_rc_objetivo, Color(1.0, 0.2, 0.8, 0.8), 2.0)
+		var dir_local: Vector2 = componente_detector.ultimo_rc_objetivo
+		if casters:
+			dir_local = dir_local.rotated(casters.rotation)
+		draw_line(Vector2.ZERO, dir_local, Color(1.0, 0.2, 0.8, 0.8), 2.0)
 #endregion

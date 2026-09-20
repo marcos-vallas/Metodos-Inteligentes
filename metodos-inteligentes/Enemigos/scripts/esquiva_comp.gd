@@ -53,7 +53,8 @@ func procesar_maniobra(
 	area_chica: Area2D,
 	obstaculos_en_rango: Array[Node2D],
 	dir_amenaza: Vector2 = Vector2.ZERO,
-	fallback_wander: Vector2 = Vector2.ZERO
+	fallback_wander: Vector2 = Vector2.ZERO,
+	direccion_deseada: Vector2 = Vector2.ZERO
 ) -> Vector2:
 	if not detector:
 		return esquivar(direccion_actual, delta)
@@ -63,12 +64,12 @@ func procesar_maniobra(
 	
 	# Despegue forzado al superar el tiempo máximo de esquiva continuo
 	if timer_esquivando >= tiempo_max_esquivando:
-		dir_resultado = detector.forzar_despegue_pared(actor, casters, area_chica, obstaculos_en_rango, dir_amenaza)
+		dir_resultado = detector.forzar_despegue_pared(actor, casters, area_chica, obstaculos_en_rango, dir_amenaza, direccion_deseada)
 		timer_esquivando = 0.0
 		if casters and dir_resultado != Vector2.ZERO:
 			casters.rotation = dir_resultado.angle()
 	else:
-		dir_resultado = detector.calcular_direccion_evasion(actor, casters, area_chica, obstaculos_en_rango, dir_amenaza, fallback_wander)
+		dir_resultado = detector.calcular_direccion_evasion(actor, casters, area_chica, obstaculos_en_rango, dir_amenaza, fallback_wander, direccion_deseada)
 	
 	establecer_direccion(dir_resultado)
 	return esquivar(direccion_actual, delta)
@@ -78,14 +79,12 @@ func puede_salir(
 	detector: ObstacleDetectorComponent,
 	actor_pos: Vector2,
 	casters: Node2D,
-	obstaculos_en_rango: Array[Node2D],
+	_obstaculos_en_rango: Array[Node2D] = [],
 	dir_amenaza: Vector2 = Vector2.ZERO,
 	espacio_2d: PhysicsDirectSpaceState2D = null,
 	rid_actor: RID = RID()
 ) -> bool:
 	if timer_esquivando < tiempo_min_esquivando:
-		return false
-	if not obstaculos_en_rango.is_empty():
 		return false
 	if detector and detector.hay_obstaculo_anticipado(actor_pos, casters):
 		return false

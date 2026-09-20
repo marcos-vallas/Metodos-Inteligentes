@@ -1,5 +1,5 @@
 extends Agente3
-class_name Wanderer
+class_name AgenteAnimado
 
 
 @export_category("Components")

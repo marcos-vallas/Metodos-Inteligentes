@@ -1,26 +1,36 @@
 [gd_scene format=3 uid="uid://c4fgm3atd851i"]
 
-[ext_resource type="Script" uid="uid://bi06kx2tefo7j" path="res://Player/Scenes/Wanderer.gd" id="1_b35kj"]
-[ext_resource type="Script" uid="uid://bghadbdk1uui0" path="res://Player/Scripts/movement_component.gd" id="2_ffji8"]
+[ext_resource type="Script" uid="uid://ba48neba8i2sb" path="res://Player/Scenes/Base/Agente_Animado.gd" id="1_toci6"]
 [ext_resource type="Script" uid="uid://bvlh8detick8e" path="res://Player/Scripts/state_component.gd" id="3_dbj31"]
 [ext_resource type="Script" uid="uid://03le87n0pah5" path="res://Player/Scripts/animation_component.gd" id="4_p4n8j"]
+[ext_resource type="Script" uid="uid://cuvjqo3wnfjja" path="res://Enemigos/scripts/wander_comp.gd" id="4_toci6"]
 [ext_resource type="Texture2D" uid="uid://bd3bey6vt03a" path="res://Resources/Factions/Knights/Troops/Archer/Yellow/Archer_Yellow.png" id="5_k1cqu"]
+[ext_resource type="Script" uid="uid://bxrgdr67y0b6c" path="res://Enemigos/scripts/esquiva_comp.gd" id="5_ljumc"]
+[ext_resource type="Script" uid="uid://dwb4022gfdnlf" path="res://Enemigos/scripts/detector_obstaculos_comp.gd" id="6_oa5bx"]
 
-[sub_resource type="Resource" id="Resource_ffv5t"]
-script = ExtResource("2_ffji8")
-metadata/_custom_type_script = "uid://bghadbdk1uui0"
-
-[sub_resource type="Resource" id="Resource_o00bb"]
+[sub_resource type="Resource" id="Resource_nmbfv"]
 script = ExtResource("3_dbj31")
 metadata/_custom_type_script = "uid://bvlh8detick8e"
 
-[sub_resource type="Resource" id="Resource_ubvuf"]
+[sub_resource type="Resource" id="Resource_ic5wi"]
 script = ExtResource("4_p4n8j")
 metadata/_custom_type_script = "uid://03le87n0pah5"
 
+[sub_resource type="Resource" id="Resource_xcqgk"]
+script = ExtResource("4_toci6")
+metadata/_custom_type_script = "uid://cuvjqo3wnfjja"
+
+[sub_resource type="Resource" id="Resource_bjdyl"]
+script = ExtResource("5_ljumc")
+metadata/_custom_type_script = "uid://bxrgdr67y0b6c"
+
+[sub_resource type="Resource" id="Resource_7wwxl"]
+script = ExtResource("6_oa5bx")
+metadata/_custom_type_script = "uid://dwb4022gfdnlf"
+
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_7jgbj"]
-radius = 23.333332
-height = 80.0
+radius = 11.0
+height = 32.0
 
 [sub_resource type="Animation" id="Animation_ffv5t"]
 length = 0.001
@@ -157,10 +167,10 @@ tracks/0/path = NodePath("WarriorBlue:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
 "update": 1,
-"values": [1, 2, 3, 4, 5]
+"values": [0, 1, 2, 3, 4, 5]
 }
 
 [sub_resource type="Animation" id="Animation_gs3kl"]
@@ -178,7 +188,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
 "update": 1,
-"values": [6, 7, 8, 9, 10, 11]
+"values": [8, 9, 10, 11, 12, 13]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_03qnj"]
@@ -223,28 +233,37 @@ states/run/node = SubResource("AnimationNodeAnimation_qknkb")
 states/run/position = Vector2(658, 115)
 transitions = ["Start", "idle", SubResource("AnimationNodeStateMachineTransition_o00bb"), "idle", "run", SubResource("AnimationNodeStateMachineTransition_l6m33"), "run", "idle", SubResource("AnimationNodeStateMachineTransition_gs3kl"), "idle", "anim1", SubResource("AnimationNodeStateMachineTransition_03qnj"), "anim1", "idle", SubResource("AnimationNodeStateMachineTransition_qw2rl")]
 
-[node name="Wanderer" type="CharacterBody2D" unique_id=763683405 node_paths=PackedStringArray("animation_tree") groups=["Player"]]
-scale = Vector2(0.3, 0.3)
-collision_layer = 8
-collision_mask = 247
+[sub_resource type="CircleShape2D" id="CircleShape2D_toci6"]
+radius = 183.04372
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ljumc"]
+radius = 33.06055
+
+[node name="Wanderer" type="CharacterBody2D" unique_id=763683405 node_paths=PackedStringArray("animation_tree", "sprite_character", "area_grande", "area_chica", "casters") groups=["NPC"]]
+collision_layer = 16
+collision_mask = 7
 platform_floor_layers = 4294967041
 platform_wall_layers = 2
-script = ExtResource("1_b35kj")
-movement_comp = SubResource("Resource_ffv5t")
-state_comp = SubResource("Resource_o00bb")
+script = ExtResource("1_toci6")
+state_comp = SubResource("Resource_nmbfv")
 animation_tree = NodePath("AnimationTree")
-animation_comp = SubResource("Resource_ubvuf")
+animation_comp = SubResource("Resource_ic5wi")
+sprite_character = NodePath("WarriorBlue")
+componente_wander = SubResource("Resource_xcqgk")
+componente_esquiva = SubResource("Resource_bjdyl")
+componente_detector = SubResource("Resource_7wwxl")
+area_grande = NodePath("AreaGrande")
+area_chica = NodePath("AreaChica")
+casters = NodePath("Casters")
 
 [node name="WarriorBlue" type="Sprite2D" parent="." unique_id=1306866681]
-position = Vector2(1.9073486e-06, 3.8146973e-06)
-scale = Vector2(0.9, 1.071)
+scale = Vector2(0.705, 0.705)
 texture = ExtResource("5_k1cqu")
 hframes = 8
 vframes = 7
 frame = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1848096300]
-position = Vector2(0, 3.333332)
 shape = SubResource("CapsuleShape2D_7jgbj")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=422067489]
@@ -254,4 +273,63 @@ libraries/ = SubResource("AnimationLibrary_03qnj")
 tree_root = SubResource("AnimationNodeStateMachine_qknkb")
 anim_player = NodePath("../AnimationPlayer")
 
-[node name="RayCastCentral" type="RayCast2D" parent="." unique_id=1840681622]
+[node name="AreaGrande" type="Area2D" parent="." unique_id=1303442985]
+collision_layer = 0
+collision_mask = 8
+
+[node name="areachica" type="CollisionShape2D" parent="AreaGrande" unique_id=1438458195]
+shape = SubResource("CircleShape2D_toci6")
+
+[node name="AreaChica" type="Area2D" parent="." unique_id=2116739238]
+collision_layer = 0
+collision_mask = 6
+
+[node name="areagrande" type="CollisionShape2D" parent="AreaChica" unique_id=1515333395]
+shape = SubResource("CircleShape2D_ljumc")
+
+[node name="Casters" type="Node2D" parent="." unique_id=1927170836]
+
+[node name="RC_0" type="RayCast2D" parent="Casters" unique_id=980274443]
+target_position = Vector2(141, -1)
+collision_mask = 7
+
+[node name="RayCast2D" type="RayCast2D" parent="Casters" unique_id=939821929]
+target_position = Vector2(97, -25)
+collision_mask = 7
+
+[node name="RayCast2D6" type="RayCast2D" parent="Casters" unique_id=1543348729]
+target_position = Vector2(98, 22)
+collision_mask = 7
+
+[node name="RayCast2D2" type="RayCast2D" parent="Casters" unique_id=1790308020]
+target_position = Vector2(67, -41)
+collision_mask = 7
+
+[node name="RayCast2D7" type="RayCast2D" parent="Casters" unique_id=1837841124]
+target_position = Vector2(68, 44)
+collision_mask = 7
+
+[node name="RayCast2D3" type="RayCast2D" parent="Casters" unique_id=1682089796]
+target_position = Vector2(35, -45)
+collision_mask = 7
+
+[node name="RayCast2D8" type="RayCast2D" parent="Casters" unique_id=637259955]
+target_position = Vector2(28, 44)
+collision_mask = 7
+
+[node name="RayCast2D4" type="RayCast2D" parent="Casters" unique_id=1579720018]
+target_position = Vector2(0, -42)
+collision_mask = 7
+
+[node name="RayCast2D9" type="RayCast2D" parent="Casters" unique_id=1668883631]
+target_position = Vector2(0, 42)
+collision_mask = 7
+
+[node name="RC_180" type="RayCast2D" parent="Casters" unique_id=758781240]
+target_position = Vector2(-53, 0)
+collision_mask = 7
+
+[node name="Line2D" type="Line2D" parent="Casters" unique_id=1082880246]
+visible = false
+points = PackedVector2Array(-92, -1, 78, -51, 157, 0, 68, 50, -92, -1)
+default_color = Color(1, 0.53333336, 1, 0.36078432)

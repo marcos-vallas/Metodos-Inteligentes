@@ -1,0 +1,69 @@
+[gd_scene format=3 uid="uid://by2trdoq4n2yl"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_no8ee"]
+radius = 231.00217
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_mabi0"]
+radius = 23.021729
+
+[node name="AnimationComponents" type="Node2D" unique_id=953557764]
+
+[node name="AreaGrande" type="Area2D" parent="." unique_id=2082222685]
+collision_layer = 0
+collision_mask = 8
+
+[node name="areachica" type="CollisionShape2D" parent="AreaGrande" unique_id=125660044]
+shape = SubResource("CircleShape2D_no8ee")
+
+[node name="AreaChica" type="Area2D" parent="." unique_id=1101979735]
+collision_layer = 0
+collision_mask = 6
+
+[node name="areagrande" type="CollisionShape2D" parent="AreaChica" unique_id=166413107]
+shape = SubResource("CircleShape2D_mabi0")
+
+[node name="Casters" type="Node2D" parent="." unique_id=1815662490]
+
+[node name="RC_0" type="RayCast2D" parent="Casters" unique_id=976229479]
+target_position = Vector2(141, -1)
+collision_mask = 7
+
+[node name="RayCast2D" type="RayCast2D" parent="Casters" unique_id=2126578585]
+target_position = Vector2(97, -25)
+collision_mask = 7
+
+[node name="RayCast2D6" type="RayCast2D" parent="Casters" unique_id=1098272148]
+target_position = Vector2(98, 22)
+collision_mask = 7
+
+[node name="RayCast2D2" type="RayCast2D" parent="Casters" unique_id=1119618673]
+target_position = Vector2(67, -41)
+collision_mask = 7
+
+[node name="RayCast2D7" type="RayCast2D" parent="Casters" unique_id=269664585]
+target_position = Vector2(68, 44)
+collision_mask = 7
+
+[node name="RayCast2D3" type="RayCast2D" parent="Casters" unique_id=1596546877]
+target_position = Vector2(35, -45)
+collision_mask = 7
+
+[node name="RayCast2D8" type="RayCast2D" parent="Casters" unique_id=1243157880]
+target_position = Vector2(28, 44)
+collision_mask = 7
+
+[node name="RayCast2D4" type="RayCast2D" parent="Casters" unique_id=1984166987]
+target_position = Vector2(0, -42)
+collision_mask = 7
+
+[node name="RayCast2D9" type="RayCast2D" parent="Casters" unique_id=348617945]
+target_position = Vector2(0, 42)
+collision_mask = 7
+
+[node name="RC_180" type="RayCast2D" parent="Casters" unique_id=871338925]
+target_position = Vector2(-53, 0)
+collision_mask = 7
+
+[node name="Line2D" type="Line2D" parent="Casters" unique_id=360117355]
+points = PackedVector2Array(-92, -1, 78, -51, 157, 0, 68, 50, -92, -1)
+default_color = Color(1, 0.53333336, 1, 0.36078432)

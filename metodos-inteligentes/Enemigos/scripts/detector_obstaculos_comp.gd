@@ -168,79 +168,117 @@ func esta_direccion_obstruida(
 	return false
 
 # 6. BÚSQUEDA DE RUMBO LIBRE Y EVALUACIÓN DE RAYCASTS
-## Busca el mejor RayCast2D despejado evaluando colisiones por flancos (izq vs der) y amenazas.
+## Busca el mejor RayCast2D despejado evaluando colisiones por flancos (izq vs der) y proximidad angular al frente.
 func buscar_rc_libre(
 	casters: Node2D,
 	hay_bloqueo_frontal: bool,
 	dir_amenaza: Vector2 = Vector2.ZERO,
-	velocidad_actual: Vector2 = Vector2.ZERO
+	velocidad_actual: Vector2 = Vector2.ZERO,
+	_direccion_deseada: Vector2 = Vector2.ZERO
 ) -> RayCast2D:
 	if not casters or casters.get_child_count() == 0:
 		return null
 	
 	var colisiones_izquierda: int = 0
 	var colisiones_derecha: int = 0
+	var rc_frontal: RayCast2D = null
 	
 	for i in casters.get_child_count():
 		var hijo = casters.get_child(i)
-		if hijo is RayCast2D and rc_toca_obstaculo(hijo):
-			if hijo.target_position.y < -5.0:
-				colisiones_izquierda += 1
-			elif hijo.target_position.y > 5.0:
-				colisiones_derecha += 1
+		if hijo is RayCast2D:
+			var ang_local: float = abs(rad_to_deg(hijo.target_position.angle()))
+			if ang_local < 10.0 and hijo.target_position.x > 0:
+				rc_frontal = hijo
+				
+			if rc_toca_obstaculo(hijo):
+				if hijo.target_position.y < -3.0:
+					colisiones_izquierda += 1
+				elif hijo.target_position.y > 3.0:
+					colisiones_derecha += 1
 	
-	var tiene_amenaza: bool = (dir_amenaza != Vector2.ZERO)
-	var rayos_izq_libres: Array[RayCast2D] = []
-	var rayos_der_libres: Array[RayCast2D] = []
-	var rayos_otros_libres: Array[RayCast2D] = []
+	# Si no hay bloqueo frontal y el rayo central existe y está libre, es el camino óptimo
+	if not hay_bloqueo_frontal and rc_frontal and not rc_toca_obstaculo(rc_frontal):
+		ultimo_rc_objetivo = rc_frontal.target_position
+		return rc_frontal
 	
-	for i in casters.get_child_count():
-		var hijo = casters.get_child(i)
-		if hijo is RayCast2D and not rc_toca_obstaculo(hijo):
-			var angulo_deg: float = abs(rad_to_deg(hijo.target_position.angle()))
-			var dir_global_rayo: Vector2 = (hijo.to_global(hijo.target_position) - hijo.global_position).normalized()
-			
-			# Descartar rayos que apunten directamente a la amenaza
-			if tiene_amenaza and dir_global_rayo.dot(dir_amenaza) > 0.15:
-				continue
-			
-			if angulo_deg >= 25.0 and angulo_deg <= 95.0:
-				if hijo.target_position.y < -5.0:
-					rayos_izq_libres.append(hijo)
-				elif hijo.target_position.y > 5.0:
-					rayos_der_libres.append(hijo)
-			elif not hay_bloqueo_frontal and angulo_deg < 25.0:
-				rayos_otros_libres.append(hijo)
-			elif angulo_deg > 95.0 and not tiene_amenaza:
-				rayos_otros_libres.append(hijo)
-	
-	# Preferencia de flanco
+	# Preferencia de flanco: huir hacia el lado con menos colisiones
 	var preferir_izquierda: bool = false
 	if colisiones_derecha > colisiones_izquierda:
 		preferir_izquierda = true
 	elif colisiones_izquierda > colisiones_derecha:
 		preferir_izquierda = false
 	else:
-		if tiene_amenaza:
+		# En caso de empate en colisiones:
+		if dir_amenaza != Vector2.ZERO:
 			var perp_amenaza: Vector2 = dir_amenaza.orthogonal()
 			preferir_izquierda = (velocidad_actual.dot(perp_amenaza) > 0.0)
+		elif velocidad_actual != Vector2.ZERO and casters:
+			# Mantener la dirección de giro actual para evitar oscilaciones (histéresis)
+			var vel_local = casters.to_local(casters.global_position + velocidad_actual)
+			preferir_izquierda = (vel_local.y < 0.0)
 		else:
-			preferir_izquierda = (rayos_izq_libres.size() >= rayos_der_libres.size())
+			preferir_izquierda = true
 	
-	var primer_lista = rayos_izq_libres if preferir_izquierda else rayos_der_libres
-	var segunda_lista = rayos_der_libres if preferir_izquierda else rayos_izq_libres
+	var tiene_amenaza: bool = (dir_amenaza != Vector2.ZERO)
+	var rayos_izq_libres: Array[Dictionary] = []
+	var rayos_der_libres: Array[Dictionary] = []
+	var rayos_traseros_libres: Array[Dictionary] = []
 	
-	if not primer_lista.is_empty():
-		ultimo_rc_objetivo = primer_lista[0].target_position
-		return primer_lista[0]
+	for i in casters.get_child_count():
+		var hijo = casters.get_child(i)
+		if hijo is RayCast2D and not rc_toca_obstaculo(hijo):
+			var dir_global_rayo: Vector2 = (hijo.to_global(hijo.target_position) - hijo.global_position).normalized()
+			
+			# Descartar rayos que apunten directamente hacia la amenaza
+			if tiene_amenaza and dir_global_rayo.dot(dir_amenaza) > 0.15:
+				continue
+			
+			var angulo_rad: float = hijo.target_position.angle()
+			var abs_angulo_deg: float = abs(rad_to_deg(angulo_rad))
+			
+			# Si el frente está bloqueado, descartar el rayo central (0° frontal)
+			if hay_bloqueo_frontal and abs_angulo_deg < 10.0:
+				continue
+			
+			var data: Dictionary = {
+				"ray": hijo,
+				"abs_ang": abs_angulo_deg
+			}
+			
+			if abs_angulo_deg > 100.0:
+				rayos_traseros_libres.append(data)
+			elif hijo.target_position.y < -3.0 or angulo_rad < -0.05:
+				rayos_izq_libres.append(data)
+			elif hijo.target_position.y > 3.0 or angulo_rad > 0.05:
+				rayos_der_libres.append(data)
 	
-	if not segunda_lista.is_empty():
-		ultimo_rc_objetivo = segunda_lista[0].target_position
-		return segunda_lista[0]
+	# Ordenar los rayos por cercanía al frente (menor ángulo absoluto primero)
+	var sort_func = func(a: Dictionary, b: Dictionary) -> bool:
+		return a["abs_ang"] < b["abs_ang"]
+	rayos_izq_libres.sort_custom(sort_func)
+	rayos_der_libres.sort_custom(sort_func)
+	rayos_traseros_libres.sort_custom(sort_func)
 	
-	if not rayos_otros_libres.is_empty():
-		ultimo_rc_objetivo = rayos_otros_libres[0].target_position
-		return rayos_otros_libres[0]
+	# Prioridad 1: el rayo libre con menor desviación en el flanco preferido
+	var lista_primaria = rayos_izq_libres if preferir_izquierda else rayos_der_libres
+	var lista_secundaria = rayos_der_libres if preferir_izquierda else rayos_izq_libres
+	
+	if not lista_primaria.is_empty():
+		var elegido: RayCast2D = lista_primaria[0]["ray"]
+		ultimo_rc_objetivo = elegido.target_position
+		return elegido
+	
+	# Prioridad 2: el rayo libre con menor desviación en el flanco secundario
+	if not lista_secundaria.is_empty():
+		var elegido: RayCast2D = lista_secundaria[0]["ray"]
+		ultimo_rc_objetivo = elegido.target_position
+		return elegido
+	
+	# Prioridad 3: rayos traseros (incluyendo RC_180), solo si todo el frente/laterales están bloqueados
+	if not rayos_traseros_libres.is_empty():
+		var elegido: RayCast2D = rayos_traseros_libres[0]["ray"]
+		ultimo_rc_objetivo = elegido.target_position
+		return elegido
 	
 	return null
 
@@ -252,37 +290,47 @@ func calcular_direccion_evasion(
 	area_chica: Area2D,
 	obstaculos_en_rango: Array[Node2D],
 	dir_amenaza: Vector2 = Vector2.ZERO,
-	fallback_wander: Vector2 = Vector2.ZERO
+	fallback_wander: Vector2 = Vector2.ZERO,
+	direccion_deseada: Vector2 = Vector2.ZERO
 ) -> Vector2:
-	# 1. Si hay una pared dentro de AreaChica, se prioriza el vector contrario a la pared
+	var hay_bloqueo_frontal: bool = false
+	if casters and casters.get_child_count() > 0:
+		var rc_0 = casters.get_child(0) as RayCast2D
+		if rc_0 and rc_toca_obstaculo(rc_0):
+			hay_bloqueo_frontal = true
+	if not hay_bloqueo_frontal and actor and hay_obstaculo_anticipado(actor.global_position, casters):
+		hay_bloqueo_frontal = true
+
+	# 1. Búsqueda de raycast libre con mínima desviación angular
+	var rc: RayCast2D = buscar_rc_libre(casters, hay_bloqueo_frontal, dir_amenaza, actor.velocity if actor else Vector2.ZERO, direccion_deseada)
+	if rc:
+		var dir_rc: Vector2 = (rc.to_global(rc.target_position) - rc.global_position).normalized()
+		# Si hay una pared muy cercana dentro de AreaChica, aplicar una suave repulsión para no raspar la pared
+		if hay_pared_en_area(area_chica, obstaculos_en_rango):
+			var vec_pared: Vector2 = obtener_vector_contrario_a_pared(casters, false)
+			if vec_pared != Vector2.ZERO and vec_pared.dot(dir_rc) < 0.8:
+				dir_rc = (dir_rc * 0.75 + vec_pared * 0.25).normalized()
+		return dir_rc
+
+	# 2. Si no hay ningún rayo libre y hay pared en AreaChica, usar vector contrario como escape de emergencia
 	if hay_pared_en_area(area_chica, obstaculos_en_rango):
 		var vec_pared: Vector2 = obtener_vector_contrario_a_pared(casters)
 		if vec_pared != Vector2.ZERO:
-			# Si estamos amenazados (ej. jugador acorralando) y el vector apunta hacia la amenaza:
 			if dir_amenaza != Vector2.ZERO and vec_pared.dot(dir_amenaza) > 0.0:
 				var tang: Vector2 = vec_pared.orthogonal()
 				if tang.dot(dir_amenaza) > (-tang).dot(dir_amenaza):
 					tang = -tang
 				vec_pared = (vec_pared * 0.35 + tang * 0.85).normalized()
 			return vec_pared
-	
-	# 2. Búsqueda de raycast libre según balance izquierda/derecha
-	var hay_bloqueo_frontal: bool = not obstaculos_en_rango.is_empty()
-	if casters and casters.get_child_count() > 0:
-		var rc_0 = casters.get_child(0) as RayCast2D
-		if rc_0 and rc_toca_obstaculo(rc_0):
-			hay_bloqueo_frontal = true
-	
-	var rc: RayCast2D = buscar_rc_libre(casters, hay_bloqueo_frontal, dir_amenaza, actor.velocity if actor else Vector2.ZERO)
-	if rc:
-		return (rc.to_global(rc.target_position) - rc.global_position).normalized()
-	
+
 	# 3. Fallbacks si todos los rayos están bloqueados
 	if dir_amenaza != Vector2.ZERO:
 		var tang: Vector2 = dir_amenaza.orthogonal()
 		if actor and actor.velocity != Vector2.ZERO and tang.dot(actor.velocity) < 0.0:
 			tang = -tang
 		return tang.normalized()
+	elif direccion_deseada != Vector2.ZERO:
+		return -direccion_deseada.normalized()
 	elif actor and actor.velocity != Vector2.ZERO:
 		return -actor.velocity.normalized()
 	elif fallback_wander != Vector2.ZERO:
@@ -296,7 +344,8 @@ func forzar_despegue_pared(
 	casters: Node2D,
 	area_chica: Area2D,
 	obstaculos_en_rango: Array[Node2D],
-	dir_amenaza: Vector2 = Vector2.ZERO
+	dir_amenaza: Vector2 = Vector2.ZERO,
+	direccion_deseada: Vector2 = Vector2.ZERO
 ) -> Vector2:
 	if hay_pared_en_area(area_chica, obstaculos_en_rango):
 		var vec_contrario: Vector2 = obtener_vector_contrario_a_pared(casters)
@@ -308,8 +357,8 @@ func forzar_despegue_pared(
 				vec_contrario = (vec_contrario * 0.35 + tang * 0.85).normalized()
 			return vec_contrario
 	
-	var hay_bloqueo_frontal: bool = not obstaculos_en_rango.is_empty()
-	var rc_fallback: RayCast2D = buscar_rc_libre(casters, hay_bloqueo_frontal, dir_amenaza, actor.velocity if actor else Vector2.ZERO)
+	var hay_bloqueo_frontal: bool = true
+	var rc_fallback: RayCast2D = buscar_rc_libre(casters, hay_bloqueo_frontal, dir_amenaza, actor.velocity if actor else Vector2.ZERO, direccion_deseada)
 	if rc_fallback:
 		return (rc_fallback.to_global(rc_fallback.target_position) - rc_fallback.global_position).normalized()
 	

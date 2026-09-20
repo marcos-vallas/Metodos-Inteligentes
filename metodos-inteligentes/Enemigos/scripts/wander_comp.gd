@@ -63,11 +63,11 @@ func establecer_objetivo(nueva_direccion: Vector2, reiniciar_timer: bool = true)
 		_tiempo_restante = tiempo_movimiento
 	rumbo_cambiado.emit(direccion_objetivo)
 
-## Asigna un nuevo objetivo calculando la dirección desde la posición global actual hacia un punto de destino.
-func establecer_objetivo_hacia_posicion(posicion_actual: Vector2, punto_objetivo: Vector2, reiniciar_timer: bool = true) -> void:
-	var direccion: Vector2 = punto_objetivo - posicion_actual
-	if direccion != Vector2.ZERO:
-		establecer_objetivo(direccion, reiniciar_timer)
+### Asigna un nuevo objetivo calculando la dirección desde la posición global actual hacia un punto de destino.
+#func establecer_objetivo_hacia_posicion(posicion_actual: Vector2, punto_objetivo: Vector2, reiniciar_timer: bool = true) -> void:
+	#var direccion: Vector2 = punto_objetivo - posicion_actual
+	#if direccion != Vector2.ZERO:
+		#establecer_objetivo(direccion, reiniciar_timer)
 
 ## Setter seguro de direccion_objetivo
 func set_direccion_objetivo(valor: Vector2) -> void:
