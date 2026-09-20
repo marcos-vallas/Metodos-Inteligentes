@@ -16,6 +16,11 @@ var wander_angle : float = 0.0
 
 var move_direction = Vector2.ZERO
 
+
+func _init() -> void:
+	resource_local_to_scene = true
+
+
 func get_motion() -> Vector2:
 	move_direction = Vector2.ZERO
 	move_direction.x = int(Input.is_action_pressed("right")) - int(Input.is_action_pressed("left"))

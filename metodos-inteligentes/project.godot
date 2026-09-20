@@ -30,6 +30,7 @@ folder_colors={
 
 Player=""
 Obstaculos=""
+Pared=""
 
 [input]
 

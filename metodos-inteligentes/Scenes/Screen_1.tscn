@@ -5,9 +5,10 @@
 [ext_resource type="PackedScene" uid="uid://wxpcc7lpsdn6" path="res://Enemigos/Navigation/Agente_3.tscn" id="4_6xqqw"]
 [ext_resource type="Script" uid="uid://cuvjqo3wnfjja" path="res://Enemigos/scripts/wander_comp.gd" id="4_8jxof"]
 
-[sub_resource type="Resource" id="Resource_3dr1i"]
+[sub_resource type="Resource" id="Resource_6xqqw"]
 resource_local_to_scene = true
 script = ExtResource("4_8jxof")
+tiempo_movimiento = 5.6
 angulo_min_variacion = 59.5
 angulo_max_variacion = 103.5
 metadata/_custom_type_script = "uid://cuvjqo3wnfjja"
@@ -18,8 +19,8 @@ metadata/_custom_type_script = "uid://cuvjqo3wnfjja"
 
 [node name="Player" parent="." unique_id=763683405 instance=ExtResource("2_ubvuf")]
 position = Vector2(170, 188)
-collision_mask = 3
+collision_mask = 7
 
 [node name="Agente3" parent="." unique_id=1056296151 instance=ExtResource("4_6xqqw")]
 position = Vector2(447, 555)
-componente_wander = SubResource("Resource_3dr1i")
+componente_wander = SubResource("Resource_6xqqw")
