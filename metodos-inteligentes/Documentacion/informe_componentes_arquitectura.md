@@ -11,31 +11,31 @@ En Godot tradicional, muchos desarrolladores crean "componentes" como nodos hijo
 
 ```mermaid
 graph TD
-    subgraph Escena_Actor ["Actor (CharacterBody2D: Chaser / Coward / Wanderer)"]
-        CB["AgenteAnimado (Extiende Agente3)"]
-        Sensors["Nodos Sensores (AreaGrande, AreaChica, Casters RayCast2D)"]
-        Visuals["Visuales (Sprite2D, AnimationPlayer, AnimationTree)"]
-    end
+	subgraph Escena_Actor ["Actor (CharacterBody2D: Chaser / Coward / Wanderer)"]
+		CB["AgenteAnimado (Extiende Agente3)"]
+		Sensors["Nodos Sensores (AreaGrande, AreaChica, Casters RayCast2D)"]
+		Visuals["Visuales (Sprite2D, AnimationPlayer, AnimationTree)"]
+	end
 
-    subgraph Recursos_Logica ["Componentes Desacoplados (Resource)"]
-        W["WanderComponent<br/>(Deambular persistente)"]
-        S["SeekComponent<br/>(Persecución + Arrive)"]
-        F["FleeComponent<br/>(Huida)"]
-        E["EsquivaComponent<br/>(Velocidad y tiempos maniobra)"]
-        D["ObstacleDetectorComponent<br/>(Análisis geométrico de sensores)"]
-        ST["StateComponent<br/>(FSM de animación y movimiento)"]
-        A["AnimationComponent<br/>(Puente con AnimationTree)"]
-    end
+	subgraph Recursos_Logica ["Componentes Desacoplados (Resource)"]
+		W["WanderComponent<br/>(Deambular persistente)"]
+		S["SeekComponent<br/>(Persecución + Arrive)"]
+		F["FleeComponent<br/>(Huida)"]
+		E["EsquivaComponent<br/>(Velocidad y tiempos maniobra)"]
+		D["ObstacleDetectorComponent<br/>(Análisis geométrico de sensores)"]
+		ST["StateComponent<br/>(FSM de animación y movimiento)"]
+		A["AnimationComponent<br/>(Puente con AnimationTree)"]
+	end
 
-    CB -->|Inyecta parámetros y consulta| W
-    CB -->|Inyecta parámetros y consulta| S
-    CB -->|Inyecta parámetros y consulta| F
-    CB -->|Coordina maniobra| E
-    E -->|Consulta rayos y paredes| D
-    Sensors -->|Alimentan datos a| D
-    CB -->|Actualiza velocidad a| ST
-    ST -->|Notifica estado a| A
-    A -->|Dispara animación en| Visuals
+	CB -->|Inyecta parámetros y consulta| W
+	CB -->|Inyecta parámetros y consulta| S
+	CB -->|Inyecta parámetros y consulta| F
+	CB -->|Coordina maniobra| E
+	E -->|Consulta rayos y paredes| D
+	Sensors -->|Alimentan datos a| D
+	CB -->|Actualiza velocidad a| ST
+	ST -->|Notifica estado a| A
+	A -->|Dispara animación en| Visuals
 ```
 
 ### ¿Por qué se hizo así? (Ventajas clave para explicar)
@@ -59,12 +59,12 @@ En lugar de cambiar de dirección bruscamente en cada tick de física (lo que ca
 
 ```mermaid
 flowchart LR
-    A["Rumbo Actual"] --> B{"¿Expiró tiempo_movimiento?"}
-    B -- No --> C["Mantener rumbo * speed"]
-    B -- Sí --> D["Elegir ángulo aleatorio entre min y max"]
-    D --> E["Rotar rumbo a izq/der (- o +)"]
-    E --> F["Reiniciar temporizador"]
-    F --> C
+	A["Rumbo Actual"] --> B{"¿Expiró tiempo_movimiento?"}
+	B -- No --> C["Mantener rumbo * speed"]
+	B -- Sí --> D["Elegir ángulo aleatorio entre min y max"]
+	D --> E["Rotar rumbo a izq/der (- o +)"]
+	E --> F["Reiniciar temporizador"]
+	F --> C
 ```
 
 #### Parámetros explicados:
@@ -89,7 +89,7 @@ Calcula el vector que va desde la posición actual del agente hacia la posición
 
 ```
 [Agente] --------------> |--- Zona Arrive (frena) ---|--- Zona Parada (0 vel) --- [Objetivo]
-                         ^ arrive_slowing_radius     ^ arrive_stop_radius
+						 ^ arrive_slowing_radius     ^ arrive_stop_radius
 ```
 
 #### Parámetros explicados:
@@ -149,16 +149,16 @@ Es el componente más técnico y completo del proyecto. Analiza el abanico de se
 
 ```mermaid
 flowchart TD
-    Rayos["Abanico de RayCasts en Casters"] --> Flancos["Contar colisiones Izquierda vs Derecha"]
-    Flancos --> Filtro{"¿Frente bloqueado?"}
-    Filtro -- No --> CaminoFrontal["Usar rayo frontal si está libre"]
-    Filtro -- Sí --> Descarte["Descartar rayo central"]
-    Descarte --> Preferencia["Priorizar rayos libres del flanco menos obstruido"]
-    Preferencia --> Ordenar["Ordenar rayos libres por menor ángulo con el frente"]
-    Ordenar --> Elegir["Seleccionar rayo libre óptimo"]
-    Elegir --> Repulsion{"¿Hay pared en AreaChica?"}
-    Repulsion -- Sí --> Mezcla["Mezclar rumbo con vector opuesto a la pared"]
-    Repulsion -- No --> RumboFinal["Adoptar dirección del rayo"]
+	Rayos["Abanico de RayCasts en Casters"] --> Flancos["Contar colisiones Izquierda vs Derecha"]
+	Flancos --> Filtro{"¿Frente bloqueado?"}
+	Filtro -- No --> CaminoFrontal["Usar rayo frontal si está libre"]
+	Filtro -- Sí --> Descarte["Descartar rayo central"]
+	Descarte --> Preferencia["Priorizar rayos libres del flanco menos obstruido"]
+	Preferencia --> Ordenar["Ordenar rayos libres por menor ángulo con el frente"]
+	Ordenar --> Elegir["Seleccionar rayo libre óptimo"]
+	Elegir --> Repulsion{"¿Hay pared en AreaChica?"}
+	Repulsion -- Sí --> Mezcla["Mezclar rumbo con vector opuesto a la pared"]
+	Repulsion -- No --> RumboFinal["Adoptar dirección del rayo"]
 ```
 
 #### Parámetros explicados:
@@ -199,38 +199,38 @@ La lógica de los NPCs no está escrita en escenas sueltas, sino estructurada en
 
 ```
 CharacterBody2D (Godot)
-       └── Agente3 (Cerebro FSM + Sensores + Coordinación de Componentes)
-              └── AgenteAnimado (Agrega StateComponent + AnimationComponent + Flip Sprite)
-                     ├── Chaser (Configurado como TipoNPC.SEEKER)
-                     ├── Coward (Configurado como TipoNPC.FLEEKER)
-                     └── Wanderer (Configurado como TipoNPC.WANDERER)
+	   └── Agente3 (Cerebro FSM + Sensores + Coordinación de Componentes)
+			  └── AgenteAnimado (Agrega StateComponent + AnimationComponent + Flip Sprite)
+					 ├── Chaser (Configurado como TipoNPC.SEEKER)
+					 ├── Coward (Configurado como TipoNPC.FLEEKER)
+					 └── Wanderer (Configurado como TipoNPC.WANDERER)
 ```
 
 ### 3.1. Máquina de Estados Finita (FSM) de `Agente3`
 
 ```mermaid
 stateDiagram-v2
-    [*] --> WANDER: Inicialización
+	[*] --> WANDER: Inicialización
 
-    WANDER --> SEEK: Player entra a AreaGrande (si es SEEKER)
-    SEEK --> WANDER: Player sale de AreaGrande
+	WANDER --> SEEK: Player entra a AreaGrande (si es SEEKER)
+	SEEK --> WANDER: Player sale de AreaGrande
 
-    WANDER --> FLEE: Player entra a AreaGrande (si es FLEEKER)
-    FLEE --> WANDER: Player sale de AreaGrande
+	WANDER --> FLEE: Player entra a AreaGrande (si es FLEEKER)
+	FLEE --> WANDER: Player sale de AreaGrande
 
-    WANDER --> ESQUIVANDO: Obstáculo en AreaChica o Rayo Frontal
-    SEEK --> ESQUIVANDO: Obstáculo en AreaChica o Rayo Frontal
-    FLEE --> ESQUIVANDO: Obstáculo en AreaChica o Rayo Frontal
+	WANDER --> ESQUIVANDO: Obstáculo en AreaChica o Rayo Frontal
+	SEEK --> ESQUIVANDO: Obstáculo en AreaChica o Rayo Frontal
+	FLEE --> ESQUIVANDO: Obstáculo en AreaChica o Rayo Frontal
 
-    state ESQUIVANDO {
-        [*] --> ManiobraActiva
-        ManiobraActiva --> DespeguePared: timer_esquivando >= tiempo_max_esquivando
-        DespeguePared --> ManiobraActiva
-    }
+	state ESQUIVANDO {
+		[*] --> ManiobraActiva
+		ManiobraActiva --> DespeguePared: timer_esquivando >= tiempo_max_esquivando
+		DespeguePared --> ManiobraActiva
+	}
 
-    ESQUIVANDO --> WANDER: puede_salir() == true (Wanderer o sin Player)
-    ESQUIVANDO --> SEEK: puede_salir() == true (Seeker con Player en rango)
-    ESQUIVANDO --> FLEE: puede_salir() == true (Fleeker con Player en rango)
+	ESQUIVANDO --> WANDER: puede_salir() == true (Wanderer o sin Player)
+	ESQUIVANDO --> SEEK: puede_salir() == true (Seeker con Player en rango)
+	ESQUIVANDO --> FLEE: puede_salir() == true (Fleeker con Player en rango)
 ```
 
 ### 3.2. Sensores físicos en el Actor
